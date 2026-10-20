@@ -1,0 +1,24 @@
+# Rust build artefacts
+/target/
+/src-tauri/target/
+
+# Tauri generated schemas
+/src-tauri/gen/
+
+# Local database and run artefacts
+/data/
+/output/
+
+# Front end
+/ui/node_modules/
+/ui/dist/
+/ui/.vite/
+
+# Editors and OS noise
+.DS_Store
+Thumbs.db
+*.local
+
+# The repository root ignores any directory called `docs/` (it is the R pkgdown
+# output). The Studio documentation is source, not a build artefact.
+!docs/

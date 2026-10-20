@@ -1,0 +1,32 @@
+McMarcel Studio
+Copyright (C) 2024-2026 McMarcel Studio contributors
+
+This program is free software: you can redistribute it and/or modify it under the terms of the
+GNU General Public License as published by the Free Software Foundation, either version 3 of the
+License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without
+even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not,
+see <https://www.gnu.org/licenses/>.
+
+The full licence text is in the `LICENSE` file at the root of the repository.
+
+Relationship to the R implementation
+------------------------------------
+
+`mcmarcel-rs/` is a rewrite of the McMarcel R project that lives in the parent directory. The R
+code is the validation oracle for the rewrite and remains the reference implementation of the
+model; it is not called at runtime. Because both are distributed under the GNU General Public
+License version 3 or later, the obligations of that licence apply to this rewrite as well: any
+derivative distribution must keep the licence, provide the corresponding source and state the
+changes.
+
+Citation
+--------
+
+Getaneh et al. (2023) Cost-effectiveness of monoclonal antibody and maternal immunization against
+respiratory syncytial virus (RSV) in infants: Evaluation for six European countries. Vaccine.
+41(9), 1623-1631.

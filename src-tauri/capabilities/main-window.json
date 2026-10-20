@@ -1,0 +1,10 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "main-window",
+  "description": "The Studio window talks to the local API over loopback HTTP. No Tauri IPC surface is exposed to the webview.",
+  "windows": ["main"],
+  "permissions": [],
+  "remote": {
+    "urls": ["http://127.0.0.1:*", "http://localhost:*"]
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "McMarcel Studio",
+  "mainBinaryName": "mcmarcel-studio",
+  "version": "0.1.0",
+  "identifier": "org.chermid.mcmarcel.studio",
+  "build": {
+    "frontendDist": "../ui/dist"
+  },
+  "app": {
+    "withGlobalTauri": false,
+    "windows": [],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://127.0.0.1:* http://localhost:*; object-src 'none'; base-uri 'none'",
+      "capabilities": ["main-window"]
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "resources": {
+      "../ui/dist": "ui/dist"
+    },
+    "copyright": "McMarcel Studio contributors — GPL-3.0-or-later",
+    "licenseFile": "../../LICENSE",
+    "shortDescription": "Country-configurable RSV cost-effectiveness modelling",
+    "longDescription": "McMarcel Studio is a local-first desktop application for probabilistic RSV burden and cost-effectiveness modelling. Country evidence, provenance and run artefacts stay on the user's machine."
+  }
+}

@@ -1,0 +1,26 @@
+[package]
+name = "mcmarcel-desktop"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.85"
+license = "GPL-3.0-or-later"
+authors = ["McMarcel Studio contributors"]
+description = "Desktop shell for McMarcel Studio."
+publish = false
+
+[workspace]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+mcmarcel-server = { path = "../crates/mcmarcel-server" }
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
