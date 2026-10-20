@@ -23,7 +23,10 @@ args <- commandArgs(trailingOnly = FALSE)
 file_arg <- grep("^--file=", args, value = TRUE)
 script_path <- normalizePath(sub("^--file=", "", file_arg[1]))
 rs_root <- normalizePath(file.path(dirname(script_path), ".."))
-repo_root <- normalizePath(file.path(rs_root, ".."))
+source(file.path(dirname(script_path), "mcmarcel_root.R"))
+repo_root <- resolve_mcmarcel_root(script_path)
+# The upstream configuration reads its input files relative to the working
+# directory, so the script runs from the root of the R project.
 setwd(repo_root)
 
 source(file.path(repo_root, "functions", "RSV_load_all.R"))

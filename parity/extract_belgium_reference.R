@@ -17,8 +17,8 @@ args <- commandArgs(trailingOnly = FALSE)
 file_arg <- grep("^--file=", args, value = TRUE)
 script_path <- normalizePath(sub("^--file=", "", file_arg[1]))
 rs_root <- normalizePath(file.path(dirname(script_path), ".."))
-repo_root <- normalizePath(file.path(rs_root, ".."))
-setwd(repo_root)
+source(file.path(dirname(script_path), "mcmarcel_root.R"))
+repo_root <- resolve_mcmarcel_root(script_path)
 
 out_path <- if (length(commandArgs(trailingOnly = TRUE)) > 0) {
   commandArgs(trailingOnly = TRUE)[1]

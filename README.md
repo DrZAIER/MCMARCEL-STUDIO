@@ -10,6 +10,14 @@ estimates.
 > stamped `SYNTHETIC FIXTURE — NOT FOR POLICY USE`. The demo pack shipped with the application
 > is deliberately synthetic Tunisia data.
 
+> **Repository layout.** This directory is the Studio. Inside the McMarcel project it lives in
+> `mcmarcel-rs/`; as a repository of its own it is the root. The commands below assume the
+> directory that holds `Cargo.toml` — run them from here.
+
+The **R implementation of McMarcel is the validation oracle** and is not part of this
+repository. The scripts under `parity/` read its input files; they locate it through the
+`MCMARCEL_R_ROOT` environment variable or a sibling checkout.
+
 ---
 
 ## Quick start
@@ -17,7 +25,6 @@ estimates.
 ### 1. Build the engine and the interface
 
 ```bash
-cd mcmarcel-rs
 cargo build --release                 # engine, API server and CLI
 cd ui && npm install && npm run build # React application
 ```
@@ -32,6 +39,9 @@ cargo run --release -p mcmarcel-server
 # Headless run of the synthetic demo pack
 cargo run --release -p mcmarcel-cli -- demo --out packs/tunisia-demo.json
 cargo run --release -p mcmarcel-cli -- run --pack packs/tunisia-demo.json --out output --draws 500
+
+# Export the country-pack questionnaire as a standalone toolkit
+cargo run --release -p mcmarcel-cli -- questionnaire --out docs/questionnaire
 ```
 
 ### 3. Desktop shell (optional)
@@ -39,7 +49,6 @@ cargo run --release -p mcmarcel-cli -- run --pack packs/tunisia-demo.json --out 
 The Tauri v2 shell starts the same local server and points a native window at it:
 
 ```bash
-cd mcmarcel-rs
 cargo build --release --manifest-path src-tauri/Cargo.toml
 ./src-tauri/target/release/mcmarcel-studio.exe
 ```
@@ -124,9 +133,11 @@ cargo check --workspace
 cd ui && npm run build        # type-checks and bundles the front end
 ```
 
-The R project in the parent directory remains the **validation oracle**. It is never called
+The R implementation of the McMarcel framework is the **validation oracle**. It is never called
 at runtime; parity is checked against fixed R fixtures and against the committed upstream
-Belgian reference outputs (see [docs/evidence-model.md](docs/evidence-model.md)).
+Belgian reference outputs (see [docs/evidence-model.md](docs/evidence-model.md)). The scripts
+that build and check those fixtures live in `parity/` and locate the R project through
+`MCMARCEL_R_ROOT` or a sibling checkout.
 
 ## Licence
 

@@ -18,11 +18,12 @@
 
 suppressPackageStartupMessages(library(jsonlite))
 
-# Locate the repository root from this script's location.
+# Locate the McMarcel R implementation: the validation oracle.
 args <- commandArgs(trailingOnly = FALSE)
 file_arg <- grep("^--file=", args, value = TRUE)
 script_path <- normalizePath(sub("^--file=", "", file_arg[1]))
-repo_root <- normalizePath(file.path(dirname(script_path), "..", ".."))
+source(file.path(dirname(script_path), "mcmarcel_root.R"))
+repo_root <- resolve_mcmarcel_root(script_path)
 
 source(file.path(repo_root, "functions", "RSV_get_burden.R"))
 source(file.path(repo_root, "functions", "RSV_get_incidence.R"))
