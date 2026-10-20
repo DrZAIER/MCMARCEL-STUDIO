@@ -217,54 +217,9 @@ writeFileSync(
 console.log('  reference.html');
 
 /* --------------------------------------------------------------- index --- */
-const indexBody = `
-<p class="lead">McMarcel Studio is a local-first application for country-configurable RSV burden and
-cost-effectiveness modelling: a Rust engine, a React interface, a local SQLite store and a
-Tauri desktop shell. Every parameter carries its evidence, and the model refuses to present
-synthetic numbers as a country estimate.</p>
-
-<div class="grid">
-  <div class="card">
-    <h3>Use the application</h3>
-    <p>The engine runs on your machine; the data never leaves it.</p>
-    <pre><code>git clone https://github.com/DrZAIER/MCMARCEL-STUDIO.git
-cd MCMARCEL-STUDIO
-cargo build --release
-cd ui &amp;&amp; npm install &amp;&amp; npm run build
-cargo run --release -p mcmarcel-server</code></pre>
-    <p class="muted">Then open <code>http://127.0.0.1:8787</code>, or build the desktop shell with
-    <code>cargo build --release --manifest-path src-tauri/Cargo.toml</code>.</p>
-  </div>
-  <div class="card">
-    <h3>Fill the questionnaire</h3>
-    <p>Seventy-seven parameters in seven sections, each with its definition, its unit, how to source it and the
-    evidence status that fits.</p>
-    <p><a class="button" href="questionnaire.html">Open the questionnaire</a></p>
-    <p class="muted">It works offline as well: <code>mcmarcel-cli questionnaire</code> writes a printable
-    document and a spreadsheet.</p>
-  </div>
-  <div class="card">
-    <h3>Read the methods</h3>
-    <p>The cohort model, the evidence model, the pack schema and the known deviations from the R
-    implementation.</p>
-    <p><a class="button ghost" href="docs/model.html">Model</a>
-       <a class="button ghost" href="docs/evidence-model.html">Evidence</a>
-       <a class="button ghost" href="docs/architecture.html">Architecture</a></p>
-  </div>
-  <div class="card">
-    <h3>Check the reference case</h3>
-    <p>The Belgian base case, produced by the engine and compared with the upstream fixture.</p>
-    <p><a class="button ghost" href="reference.html">Reference case</a></p>
-  </div>
-</div>
-
-<h2>What this site is, and what it is not</h2>
-<p>This site is the static part of McMarcel Studio: the documentation, the questionnaire toolkit and the
-published reference results. The application itself is a local-first desktop program — the Rust engine, the
-SQLite store and the production gate run on your machine, which is what keeps a country pack under the
-analyst's control. That is also why a hosted copy of the engine is not offered here: a model whose inputs
-leave the machine is a different product with different obligations.</p>
-`;
+// The landing page lives in site/landing.html so that the prose can be edited as
+// HTML rather than as a string inside a script.
+const indexBody = read('site/landing.html');
 writeFileSync(join(outDir, 'index.html'), shell({ title: 'Overview', body: indexBody }));
 console.log('  index.html');
 

@@ -573,6 +573,26 @@ input:disabled, select:disabled { background: #f2efe7; color: var(--muted); }
 .question-sources li span { font-size: 0.78rem; color: var(--muted); }
 .question-inputs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .questionnaire-actions { display: flex; justify-content: space-between; gap: 10px; padding-top: 6px; }
+
+/* ------------------------------------------------------- about McMarcel --- */
+.about-mcmarcel .prose { max-width: 92ch; font-size: 0.9rem; }
+.about-releases { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin: 16px 0; }
+.about-releases > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  border-left: 2px solid var(--brand-2);
+  padding: 4px 0 4px 12px;
+}
+.about-releases strong { font-size: 0.92rem; }
+.about-releases a { font-family: var(--mono); font-size: 0.8rem; }
+.about-aims { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 6px; }
+.about-aims > div { display: flex; gap: 10px; align-items: flex-start; }
+.about-aims p { font-size: 0.84rem; color: var(--ink-soft); }
+.about-aims .step-num { flex: 0 0 26px; }
+@media (max-width: 1080px) {
+  .about-releases, .about-aims { grid-template-columns: minmax(0, 1fr); }
+}
 .questionnaire-choice {
   display: flex;
   align-items: center;

@@ -4,14 +4,21 @@
 [![Pages](https://github.com/DrZAIER/MCMARCEL-STUDIO/actions/workflows/pages.yml/badge.svg)](https://drzaier.github.io/MCMARCEL-STUDIO/)
 
 A local-first desktop application for **country-configurable RSV burden and cost-effectiveness
-modelling**. It is a Rust rewrite of the McMarcel R framework, wrapped in a React GUI, with a
-local SQLite store and an evidence gate that refuses to present synthetic numbers as country
-estimates.
+modelling**. It is a Rust rewrite of the **McMarcel** model — *Multi-Country Model Application for
+RSV Cost-Effectiveness Policy* — built at CHERMID (University of Antwerp), wrapped in a React
+GUI, with a local SQLite store and an evidence gate that refuses to present synthetic numbers as
+country estimates.
+
+| | |
+|---|---|
+| **The original study** | McMarcel for 72 Gavi-eligible countries — [doi:10.5281/zenodo.3663447](https://doi.org/10.5281/zenodo.3663447) (12 February 2020, CC BY 4.0). Cite: Li X, Willem L, Antillon M, Bilcke J, Jit M, Beutels P. *BMC Medicine* 2020;18(1):82. |
+| **The version used here** | MCMARCEL — Belgium, version `export_zenodo1` — [doi:10.5281/zenodo.17992864](https://doi.org/10.5281/zenodo.17992864) (19 December 2025, GPL-3.0). Cite: Getaneh AM, Li X, Mao J, et al. *Vaccine* 2023;41(9):1623–1631. |
 
 > **Scientific contract.** Every parameter carries an evidence status. A pack containing
 > `MISSING` or `SYNTHETIC` evidence cannot run in production mode, and every fixture run is
 > stamped `SYNTHETIC FIXTURE — NOT FOR POLICY USE`. The demo pack shipped with the application
-> is deliberately synthetic Tunisia data.
+> is deliberately synthetic Tunisia data, and the Belgian inputs are the perturbed public release
+> of the McMarcel repository.
 
 > **Repository layout.** This directory is the Studio. Inside the McMarcel project it lives in
 > `mcmarcel-rs/`; as a repository of its own it is the root. The commands below assume the

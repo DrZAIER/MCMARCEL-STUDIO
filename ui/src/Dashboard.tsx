@@ -164,6 +164,70 @@ export function Dashboard({
           </div>
         </div>
       </Card>
+
+      <Card className="about-mcmarcel">
+        <div className="card-head">
+          <div>
+            <span className="eyebrow">The model behind this application</span>
+            <h3>McMarcel</h3>
+          </div>
+          <StatusPill status="ok" label="CHERMID · University of Antwerp" />
+        </div>
+        <p className="prose">
+          <strong>McMarcel</strong> — <em>Multi-Country Model Application for RSV Cost-Effectiveness
+          Policy</em> — is the static monthly birth-cohort model of respiratory syncytial virus
+          prevention built at CHERMID. It weighs maternal vaccination against monoclonal antibodies
+          in a given country, and it was first applied to 72 Gavi-eligible countries.
+          <strong>McMarcel Studio</strong> is the rewrite of that model: the same structure, a Rust
+          engine, a guided interface and a production gate that fails closed.
+        </p>
+        <div className="about-releases">
+          <div>
+            <span className="mini-label">The original study</span>
+            <strong>McMarcel for 72 Gavi countries</strong>
+            <a href="https://doi.org/10.5281/zenodo.3663447" target="_blank" rel="noreferrer">
+              doi:10.5281/zenodo.3663447
+            </a>
+            <span className="table-sub">
+              12 February 2020 · CC BY 4.0 · Li et al., BMC Medicine 2020;18(1):82
+            </span>
+          </div>
+          <div>
+            <span className="mini-label">The version used here</span>
+            <strong>MCMARCEL — Belgium</strong>
+            <a href="https://doi.org/10.5281/zenodo.17992864" target="_blank" rel="noreferrer">
+              doi:10.5281/zenodo.17992864
+            </a>
+            <span className="table-sub">
+              version export_zenodo1 · 19 December 2025 · GPL-3.0 · Getaneh et al., Vaccine 2023;41(9):1623–1631
+            </span>
+          </div>
+        </div>
+        <div className="about-aims">
+          <div>
+            <span className="step-num">01</span>
+            <p>
+              <strong>Belgium</strong> — the reference case. The R implementation reproduces it
+              byte-identically; the engine has to match it within a documented tolerance.
+            </p>
+          </div>
+          <div>
+            <span className="step-num">02</span>
+            <p>
+              <strong>Gavi</strong> — the 58 countries eligible in 2020 each get a pack with the life
+              table, births, life expectancy and GDP derived, and everything else waiting for
+              country evidence.
+            </p>
+          </div>
+          <div>
+            <span className="step-num">03</span>
+            <p>
+              <strong>New packs</strong> — the guided questionnaire turns a documented country into a
+              pack with full provenance.
+            </p>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

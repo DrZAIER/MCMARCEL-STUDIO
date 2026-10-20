@@ -112,6 +112,26 @@ export function Methods({
             The current demo pack is deliberately synthetic. Replace every value, matrix and source before using production
             mode. The production gate is designed to fail closed.
           </p>
+          <div className="about-releases">
+            <div>
+              <span className="mini-label">The original study</span>
+              <strong>McMarcel for 72 Gavi countries</strong>
+              <a href="https://doi.org/10.5281/zenodo.3663447" target="_blank" rel="noreferrer">
+                doi:10.5281/zenodo.3663447
+              </a>
+              <span className="table-sub">12 February 2020 · Li et al., BMC Medicine 2020;18(1):82</span>
+            </div>
+            <div>
+              <span className="mini-label">The version used here</span>
+              <strong>MCMARCEL — Belgium</strong>
+              <a href="https://doi.org/10.5281/zenodo.17992864" target="_blank" rel="noreferrer">
+                doi:10.5281/zenodo.17992864
+              </a>
+              <span className="table-sub">
+                version export_zenodo1 · 19 December 2025 · Getaneh et al., Vaccine 2023;41(9):1623–1631
+              </span>
+            </div>
+          </div>
           <div className="callout">
             <Icon name="info" size={18} />
             <span>Need a new country? Start from the blank template, import documented inputs, then let validation drive the gap list.</span>

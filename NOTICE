@@ -24,9 +24,22 @@ License version 3 or later, the obligations of that licence apply to this rewrit
 derivative distribution must keep the licence, provide the corresponding source and state the
 changes.
 
+The two releases this rewrite is based on:
+
+* McMarcel for 72 Gavi-eligible countries, Zenodo doi:10.5281/zenodo.3663447 (12 February 2020,
+  CC BY 4.0) - the original multi-country study.
+* MCMARCEL - Belgium, version export_zenodo1, Zenodo doi:10.5281/zenodo.17992864
+  (19 December 2025, GPL-3.0) - the Belgian release whose model structure and inputs this
+  rewrite reproduces.
+
 Citation
 --------
 
 Getaneh et al. (2023) Cost-effectiveness of monoclonal antibody and maternal immunization against
 respiratory syncytial virus (RSV) in infants: Evaluation for six European countries. Vaccine.
-41(9), 1623-1631.
+41(9), 1623-1631. doi:10.5281/zenodo.17992864 is the software version this rewrite follows.
+
+Li et al. (2020) Health and economic burden of respiratory syncytial virus (RSV) disease and the
+cost-effectiveness of potential interventions against RSV among children under 5 years in 72
+Gavi-eligible countries. BMC Medicine. 18(1):82. doi:10.5281/zenodo.3663447 is the software
+version of that study.

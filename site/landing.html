@@ -1,0 +1,120 @@
+<p class="lead"><strong>McMarcel</strong> — <em>Multi-Country Model Application for RSV
+Cost-Effectiveness Policy</em> — is the static monthly birth-cohort model of respiratory syncytial
+virus prevention built at CHERMID (Centre for Health Economics Research &amp; Modelling Infectious
+Diseases, University of Antwerp). It asks what maternal vaccination and monoclonal antibodies are
+worth in a given country, and it was first applied to 72 Gavi-eligible countries.
+<strong>McMarcel Studio</strong> is the rewrite of that model: a Rust engine, a guided interface, a
+local database, and an evidence gate that refuses to present synthetic numbers as a country
+estimate.</p>
+
+<h2>The study this Studio is built on</h2>
+<div class="grid">
+  <div class="card">
+    <span class="eyebrow">The original study</span>
+    <h3>McMarcel for 72 Gavi countries</h3>
+    <p>The framework was conceived to evaluate maternal and neonatal RSV immunisation strategies
+    across 72 Gavi-eligible countries. That release is archived on Zenodo and carries the model
+    implementation together with the country inputs.</p>
+    <p>
+      <a href="https://doi.org/10.5281/zenodo.3663447" rel="noopener">doi:10.5281/zenodo.3663447</a><br>
+      <span class="muted">Multi-Country Model Application for RSV Cost-Effectiveness Policy
+      (McMarcel), 12 February 2020 · file <code>mcmarcel_gavi72.zip</code> · CC BY 4.0</span>
+    </p>
+    <p class="muted">Cite: Li X, Willem L, Antillon M, Bilcke J, Jit M, Beutels P. Health and economic burden of
+    respiratory syncytial virus (RSV) disease and the cost-effectiveness of potential interventions against
+    RSV among children under 5 years in 72 Gavi-eligible countries. <em>BMC Medicine</em> 2020;18(1):82.</p>
+  </div>
+  <div class="card">
+    <span class="eyebrow">The version used here</span>
+    <h3>McMarcel — Belgium</h3>
+    <p>The code this Studio is built on is the Belgian release of the framework: the same model
+    structure, applied to a Western-European country and to its regions, with the public-release
+    perturbation described alongside.</p>
+    <p>
+      <a href="https://doi.org/10.5281/zenodo.17992864" rel="noopener">doi:10.5281/zenodo.17992864</a><br>
+      <span class="muted">MCMARCEL — Belgium, version <code>export_zenodo1</code>, 19 December 2025 ·
+      GPL-3.0 · concept DOI 10.5281/zenodo.17992863</span>
+    </p>
+    <p class="muted">Cite: Getaneh AM, Li X, Mao J, et al. Cost-effectiveness of monoclonal antibody and maternal
+    immunization against respiratory syncytial virus (RSV) in infants: evaluation for six European countries.
+    <em>Vaccine</em> 2023;41(9):1623–1631.</p>
+  </div>
+  <div class="card">
+    <span class="eyebrow">Read before you use the numbers</span>
+    <h3>Perturbed public-release inputs</h3>
+    <p>To publish the methods without the confidential data, the Belgian input files carry
+    non-systematic noise; the perturbed files are marked with an <code>X</code> (BELX, ESPX, RESCEUX).</p>
+    <p>Every affected parameter is therefore marked <code>SYNTHETIC</code> in the Studio, production
+    mode stays blocked and every run is stamped. The outputs reproduce the model faithfully while
+    staying epidemiologically non-actionable.</p>
+    <p><a class="button ghost" href="docs/evidence-model.html">The evidence model</a></p>
+  </div>
+</div>
+
+<h2>What the Studio aims to do</h2>
+<div class="grid">
+  <div class="card">
+    <span class="eyebrow">01 · Belgium</span>
+    <h3>Reproduce the reference case</h3>
+    <p>The Belgian base case is the regression target: the R implementation reproduces it
+    byte-identically, and the Rust engine has to match it within a documented tolerance. The
+    comparison found and fixed two real defects — the maternal vaccine was inheriting the
+    monoclonal antibody's catch-up coverage, and the cost-effectiveness layer mislabelled the
+    frontier of a ten-scenario comparison.</p>
+    <p><a class="button ghost" href="reference.html">The reference case</a></p>
+  </div>
+  <div class="card">
+    <span class="eyebrow">02 · Gavi</span>
+    <h3>Carry the study to the Gavi countries</h3>
+    <p>The 58 countries eligible for Gavi support in 2020 each get a pack: the life table from the
+    UN World Population Prospects 2019, the number of births, the life expectancy and the GDP per
+    capita are derived and carry their source; everything that needs country evidence stays
+    <code>MISSING</code>, so the production gate keeps the pack closed until an analyst fills it
+    in.</p>
+    <p><a class="button ghost" href="docs/gavi-countries.html">How the countries are handled</a></p>
+  </div>
+  <div class="card">
+    <span class="eyebrow">03 · New packs</span>
+    <h3>Build a country pack from the questionnaire</h3>
+    <p>Seventy-seven parameters in seven sections, each with its definition, its unit, why it
+    matters, how to source it and the evidence status that fits. Fill it in in the browser, export
+    it, and it becomes a country pack with full provenance: no value without a source, no
+    production run without evidence.</p>
+    <p><a class="button" href="questionnaire.html">Open the questionnaire</a></p>
+  </div>
+</div>
+
+<h2>Run it</h2>
+<div class="grid">
+  <div class="card">
+    <h3>The application</h3>
+    <p>The engine runs on your machine; the data never leaves it.</p>
+    <pre><code>git clone https://github.com/DrZAIER/MCMARCEL-STUDIO.git
+cd MCMARCEL-STUDIO
+cargo build --release
+cd ui &amp;&amp; npm install &amp;&amp; npm run build
+cargo run --release -p mcmarcel-server</code></pre>
+    <p class="muted">Then open <code>http://127.0.0.1:8787</code>, or build the desktop shell with
+    <code>cargo build --release --manifest-path src-tauri/Cargo.toml</code>.</p>
+  </div>
+  <div class="card">
+    <h3>The documentation</h3>
+    <p>The cohort model, the evidence model, the pack schema, the questionnaire and the known
+    deviations from the R implementation.</p>
+    <p>
+      <a class="button ghost" href="docs/model.html">Model</a>
+      <a class="button ghost" href="docs/evidence-model.html">Evidence</a>
+      <a class="button ghost" href="docs/pack-schema.html">Pack schema</a>
+      <a class="button ghost" href="docs/architecture.html">Architecture</a>
+    </p>
+    <p class="muted">The whole toolkit is also available offline:
+    <code>mcmarcel-cli questionnaire</code> writes a printable document and a spreadsheet.</p>
+  </div>
+</div>
+
+<h2>What this site is, and what it is not</h2>
+<p>This site is the static part of McMarcel Studio: the documentation, the questionnaire toolkit and
+the published reference results. The application itself is a local-first desktop program — the Rust
+engine, the SQLite store and the production gate run on your machine, which is what keeps a country
+pack under the analyst's control. That is also why a hosted copy of the engine is not offered here:
+a model whose inputs leave the machine is a different product with different obligations.</p>
