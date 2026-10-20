@@ -99,8 +99,14 @@ export function Methods({
           <p className="prose">
             The parity fixture calls the R implementation's own functions — cohort conversion, protection by cohort, the
             shared unit-price formula, the gamma parameterisation, the discounting vector and the net monetary benefit —
-            and the Rust test suite recomputes the same values. The deliberate deviations of the rewrite are listed in{' '}
+            and the Rust test suite recomputes the same values. The deliberate deviations of the rewrite are listed in
+            {' '}
             <code>docs/model.md</code>.
+          </p>
+          <p className="prose">
+            The Belgian reference pack is checked end to end against the upstream fixture committed with the R project:
+            averted cases, hospital admissions, deaths, QALYs and the incremental cost all have to match within a
+            documented tolerance.
           </p>
           <p className="prose">
             The current demo pack is deliberately synthetic. Replace every value, matrix and source before using production

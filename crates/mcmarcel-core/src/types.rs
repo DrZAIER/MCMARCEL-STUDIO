@@ -266,6 +266,91 @@ pub struct Assets {
     /// Optional life table with columns: age_years, le, le_disc, hrqale, hrqale_disc.
     #[serde(default)]
     pub life_table: Option<Matrix>,
+    /// Optional age-banded unit costs. When present, the engine samples one unit
+    /// cost per band and interpolates it over the age range, mirroring the
+    /// `approx_age_by_sim` logic of the R implementation.
+    #[serde(default)]
+    pub cost_bands: Option<CostBands>,
+    /// Optional age-specific efficacy profiles. The Belgian reference case uses
+    /// them: efficacy against hospitalisation, for instance, falls over the
+    /// first months of life in the trial-derived bootstrap files.
+    #[serde(default)]
+    pub efficacy_profile: Option<EfficacyProfile>,
+}
+
+/// Mean and standard deviation of one efficacy outcome, by age month.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct EfficacyByAge {
+    /// Mean efficacy for each age month (0..59).
+    pub mean: Vec<f64>,
+    /// Standard deviation of the sampled efficacy for each age month.
+    #[serde(default)]
+    pub sd: Vec<f64>,
+}
+
+/// Age-specific efficacy of one intervention product.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct ProductEfficacy {
+    #[serde(default)]
+    pub hospital: EfficacyByAge,
+    #[serde(default)]
+    pub outpatient: EfficacyByAge,
+    #[serde(default)]
+    pub icu: EfficacyByAge,
+    #[serde(default)]
+    pub death: EfficacyByAge,
+    #[serde(default)]
+    pub non_ma: EfficacyByAge,
+}
+
+/// Age-specific efficacy of both intervention products.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct EfficacyProfile {
+    #[serde(default)]
+    pub maternal: Option<ProductEfficacy>,
+    #[serde(default)]
+    pub mab: Option<ProductEfficacy>,
+}
+
+/// One age band of a unit cost.
+///
+/// The band stops at `max_age_months` (inclusive); the values live in the
+/// parameter map so that they keep their evidence status and source.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CostBand {
+    /// Last age month (inclusive) the band applies to.
+    pub max_age_months: u32,
+    /// Parameter key holding the mean unit cost of the band.
+    pub mean_key: String,
+    /// Parameter key holding the standard deviation of the sampled unit cost.
+    #[serde(default)]
+    pub sd_key: Option<String>,
+}
+
+/// Age-banded unit costs for the four cost categories.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct CostBands {
+    #[serde(default)]
+    pub outpatient: Vec<CostBand>,
+    #[serde(default)]
+    pub hospital: Vec<CostBand>,
+    #[serde(default)]
+    pub icu: Vec<CostBand>,
+    #[serde(default)]
+    pub non_ma: Vec<CostBand>,
+}
+
+impl CostBands {
+    /// Bands of one category, if the pack defines them.
+    pub fn category(&self, category: &str) -> Option<&[CostBand]> {
+        match category {
+            "outpatient" => Some(&self.outpatient),
+            "hospital" => Some(&self.hospital),
+            "icu" => Some(&self.icu),
+            "non_ma" => Some(&self.non_ma),
+            _ => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

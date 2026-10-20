@@ -97,12 +97,13 @@ differences are listed here so that a reviewer never has to discover them in the
 | Deviation | R implementation | Rewrite | Consequence |
 |-----------|-----------------|---------|-------------|
 | **Recurrent wheezing / asthma module** | Models recurrent wheezing after a first-year hospital admission, with costs and QALY losses to age 5 (asthma to 13) | Not implemented. The `cost_wheezing` and `qaly_loss_wheezing` parameters exist but are **not applied** | The engine raises the validation issue `model.wheezing.not_implemented` whenever those values are non-zero, so the omission is visible in every run |
-| **Age-banded unit costs** | Under-1y and 1–4y hospital and ICU costs, five outpatient age bands, interpolated with `approx_age_by_sim` | One cost per category with a standard deviation | The rewrite cannot reproduce the R's age profile of unit costs; the parity fixture keeps the R interpolation visible as a documented deviation |
 | **Caregiver QALY losses** | Optional module adding caregiver utility loss to hospital, outpatient and non-medically-attended cases | Not implemented | Results exclude caregiver spillovers (also stated on the Methods screen) |
 | **Productivity costs** | Optional societal perspective with age-banded productivity loss | Not implemented; the healthcare perspective only | Results are healthcare-perspective only |
 | **Fractional-year discounting of life expectancy** | `get_discounted_life_years` charges the fractional remainder at the *ceiling* year's full annuity | The fractional remainder is charged at the next year, the standard annuity approach | The R formula over-counts discounted life expectancy by roughly 40 % for fractional ages; the rewrite's value is the lower, standard one |
 | **Random stream** | R's Mersenne Twister with `set.seed` | Seeded ChaCha8 stream, one stream per draw, shared by all strategies | Draw-level results are not identical to R; the *distributions* are, which is why parity is asserted on the deterministic shared machinery |
-| **Wheezing probability sampling** | `rbeta` on the shape parameters from the config | Not sampled (module not implemented) | See the first row |
+| **Efficacy sampling** | Bootstrapped age profiles sampled as whole rows (the ages within a draw are correlated) | Age-specific means and standard deviations sampled per age, independently | The Belgian reference agrees within the tolerance of the regression test; the Monte Carlo spread of the maternal scenarios is slightly wider |
+| **Age-banded unit costs** | Supported | Supported (`assets.cost_bands`) | — |
+| **Age-specific efficacy** | Supported | Supported (`assets.efficacy_profile`) | — |
 
 Everything that **is** shared is asserted against the R implementation by the parity fixture
 described in [evidence-model.md](evidence-model.md).

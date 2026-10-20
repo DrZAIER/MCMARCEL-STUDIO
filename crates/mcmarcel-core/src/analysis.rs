@@ -43,9 +43,33 @@ pub fn analyze(pack: &CountryPack, summaries: &[ScenarioSummary]) -> AnalysisRes
     let mut sorted = strategies.clone();
     sorted.sort_by(|a, b| a.cost.total_cmp(&b.cost).then_with(|| b.effect.total_cmp(&a.effect)));
 
+    // Simple dominance first: a strategy is dominated when another strategy
+    // costs no more and achieves no less. Dominated strategies have to be
+    // removed before the frontier is built, otherwise they distort the ICER
+    // sequence of the remaining points.
+    let mut dominated_by: Vec<(String, String)> = sorted
+        .iter()
+        .filter_map(|strategy| {
+            sorted
+                .iter()
+                .find(|other| {
+                    other.id != strategy.id
+                        && other.cost <= strategy.cost + 1e-9
+                        && other.effect >= strategy.effect - 1e-9
+                        && (other.cost < strategy.cost - 1e-9 || other.effect > strategy.effect + 1e-9)
+                })
+                .map(|other| (strategy.id.clone(), other.id.clone()))
+        })
+        .collect();
+    let dominated_ids: Vec<String> = dominated_by.iter().map(|(id, _)| id.clone()).collect();
+
+    // The frontier is the increasing-effect sequence of the surviving strategies.
     let mut frontier: Vec<Strategy> = Vec::new();
     let mut max_effect = f64::NEG_INFINITY;
     for strategy in &sorted {
+        if dominated_ids.contains(&strategy.id) {
+            continue;
+        }
         if strategy.effect > max_effect + 1e-12 {
             frontier.push(strategy.clone());
             max_effect = strategy.effect;
@@ -74,27 +98,26 @@ pub fn analyze(pack: &CountryPack, summaries: &[ScenarioSummary]) -> AnalysisRes
         }
         match remove_index {
             Some(index) => {
-                frontier.remove(index);
+                let removed = frontier.remove(index);
+                dominated_by.push((removed.id.clone(), "an adjacent strategy".to_string()));
             }
             None => break,
         }
     }
 
     let frontier_ids: Vec<String> = frontier.iter().map(|s| s.id.clone()).collect();
-    let dominated_by: Vec<(String, String)> = strategies
-        .iter()
-        .filter(|s| !frontier_ids.contains(&s.id))
-        .filter_map(|s| {
-            sorted
+    // Every strategy that is not on the frontier is dominated: either by a
+    // single cheaper or more effective strategy, or by the two strategies that
+    // surround it on the frontier.
+    let dominated_by: Vec<(String, String)> = dominated_by
+        .into_iter()
+        .chain(
+            strategies
                 .iter()
-                .find(|other| {
-                    other.id != s.id
-                        && other.cost <= s.cost + 1e-9
-                        && other.effect >= s.effect - 1e-9
-                        && (other.cost < s.cost - 1e-9 || other.effect > s.effect + 1e-9)
-                })
-                .map(|other| (s.id.clone(), other.id.clone()))
-        })
+                .filter(|s| !frontier_ids.contains(&s.id))
+                .filter(|s| !dominated_ids.contains(&s.id))
+                .map(|s| (s.id.clone(), "the strategies around it on the frontier".to_string())),
+        )
         .collect();
 
     let mut icer_table = Vec::new();

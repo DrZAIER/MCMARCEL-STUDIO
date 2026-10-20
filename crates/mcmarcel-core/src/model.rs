@@ -31,13 +31,16 @@ impl PriceRange {
     }
 }
 
-#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct EfficacySet {
     pub hospital: UncertainValue,
     pub outpatient: UncertainValue,
     pub icu: UncertainValue,
     pub death: UncertainValue,
     pub non_ma: UncertainValue,
+    /// Optional age-specific profile; when present it replaces the scalar values.
+    #[serde(default)]
+    pub profile: Option<crate::types::ProductEfficacy>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -58,6 +61,110 @@ pub struct CostParams {
     pub icu: UncertainValue,
     pub non_ma: UncertainValue,
     pub wheezing: UncertainValue,
+}
+
+/// One resolved cost band: the age range it covers and the sampled unit cost.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+pub struct ResolvedCostBand {
+    pub max_age_months: usize,
+    pub mean: f64,
+    pub sd: f64,
+}
+
+/// Age-banded costs, resolved from the pack's parameter map.
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
+pub struct BandedCosts {    pub outpatient: Vec<ResolvedCostBand>,
+    pub hospital: Vec<ResolvedCostBand>,
+    pub icu: Vec<ResolvedCostBand>,
+    pub non_ma: Vec<ResolvedCostBand>,
+}
+
+impl BandedCosts {
+    /// Bands of one category.
+    pub fn category(&self, category: &str) -> &[ResolvedCostBand] {
+        match category {
+            "outpatient" => &self.outpatient,
+            "hospital" => &self.hospital,
+            "icu" => &self.icu,
+            "non_ma" => &self.non_ma,
+            _ => &[],
+        }
+    }
+}
+
+/// Resolve the age-banded costs of a pack, if it defines any.
+pub fn build_banded_costs(pack: &CountryPack) -> Result<BandedCosts, Error> {
+    let mut banded = BandedCosts::default();
+    let Some(structure) = pack.assets.cost_bands.as_ref() else {
+        return Ok(banded);
+    };
+    for (category, bands) in [
+        ("outpatient", &structure.outpatient),
+        ("hospital", &structure.hospital),
+        ("icu", &structure.icu),
+        ("non_ma", &structure.non_ma),
+    ] {
+        let mut resolved = Vec::with_capacity(bands.len());
+        let mut previous: i64 = -1;
+        for band in bands {
+            let max_age = band.max_age_months as i64;
+            if max_age < 0 || max_age >= AGE_MONTHS as i64 {
+                return Err(Error::Validation(format!(
+                    "{category} cost band ends at age {max_age}, which is outside 0..{}",
+                    AGE_MONTHS - 1
+                )));
+            }
+            if max_age <= previous {
+                return Err(Error::Validation(format!(
+                    "{category} cost bands must be ordered by increasing age"
+                )));
+            }
+            previous = max_age;
+            let mean = pack.f64(&band.mean_key).map_err(|_| {
+                Error::MissingParameter(format!("{} (cost band)", band.mean_key))
+            })?;
+            if !mean.is_finite() || mean < 0.0 {
+                return Err(Error::Validation(format!(
+                    "{} must be finite and non-negative",
+                    band.mean_key
+                )));
+            }
+            let sd = band
+                .sd_key
+                .as_ref()
+                .and_then(|key| pack.parameters.get(key))
+                .and_then(|parameter| parameter.as_f64())
+                .unwrap_or(0.0)
+                .abs();
+            resolved.push(ResolvedCostBand { max_age_months: max_age as usize, mean, sd });
+        }
+        match category {
+            "outpatient" => banded.outpatient = resolved,
+            "hospital" => banded.hospital = resolved,
+            "icu" => banded.icu = resolved,
+            _ => banded.non_ma = resolved,
+        }
+    }
+    Ok(banded)
+}
+
+/// Interpolate sampled band costs over the age range.
+///
+/// Mirrors `approx_age_by_sim` in the R implementation: the value of a band
+/// applies from the previous break up to and including its own break.
+pub fn interpolate_cost_bands(bands: &[ResolvedCostBand], sampled: &[f64]) -> Vec<f64> {
+    let mut costs = vec![0.0; AGE_MONTHS];
+    if bands.is_empty() {
+        return costs;
+    }
+    for (index, band) in bands.iter().enumerate() {
+        let value = sampled.get(index).copied().unwrap_or(band.mean);
+        let start = if index == 0 { 0 } else { bands[index - 1].max_age_months + 1 };
+        for age in start..=band.max_age_months.min(AGE_MONTHS - 1) {
+            costs[age] = value;
+        }
+    }
+    costs
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -106,6 +213,8 @@ pub struct ModelInputs {
     pub non_ma: Matrix,
     pub life: LifeTable,
     pub costs: CostParams,
+    /// Age-banded unit costs; empty when the pack uses a single cost per category.
+    pub banded_costs: BandedCosts,
     pub qaly: QalyParams,
     pub maternal: InterventionProduct,
     pub mab: InterventionProduct,
@@ -191,6 +300,7 @@ pub fn build_inputs(pack: &CountryPack) -> Result<ModelInputs, Error> {
         non_ma: uncertain(pack, "cost_non_ma", "cost_non_ma_sd", 0.20)?,
         wheezing: uncertain(pack, "cost_wheezing", "cost_wheezing_sd", 0.20)?,
     };
+    let banded_costs = build_banded_costs(pack)?;
     let qaly = QalyParams {
         outpatient: uncertain(pack, "qaly_loss_outpatient", "qaly_loss_outpatient_sd", 0.20)?,
         hospital: uncertain(pack, "qaly_loss_hospital", "qaly_loss_hospital_sd", 0.20)?,
@@ -213,6 +323,7 @@ pub fn build_inputs(pack: &CountryPack) -> Result<ModelInputs, Error> {
         non_ma,
         life,
         costs,
+        banded_costs,
         qaly,
         maternal,
         mab,
@@ -266,6 +377,10 @@ fn intervention_product(pack: &CountryPack, prefix: &str, name: &str, ve_prefix:
         return Err(Error::Validation(format!("price_{prefix}_min must be non-negative")));
     }
 
+    let profile = match prefix {
+        "maternal" => pack.assets.efficacy_profile.as_ref().and_then(|p| p.maternal.clone()),
+        _ => pack.assets.efficacy_profile.as_ref().and_then(|p| p.mab.clone()),
+    };
     let efficacy = EfficacySet {
         hospital: efficacy(pack, &format!("{ve_prefix}_hospital"))?,
         outpatient: efficacy(pack, &format!("{ve_prefix}_outpatient"))?,
@@ -276,6 +391,7 @@ fn intervention_product(pack: &CountryPack, prefix: &str, name: &str, ve_prefix:
             Err(Error::MissingParameter(_)) => efficacy(pack, &format!("{ve_prefix}_outpatient"))?,
             Err(err) => return Err(err),
         },
+        profile,
     };
 
     let duration_years = pack
@@ -408,6 +524,8 @@ pub fn build_generated_assets(pack: &CountryPack) -> Result<Assets, Error> {
         hcfr_age: Some(hcfr),
         non_ma_sample_age: Some(non_ma),
         life_table: Some(life),
+        cost_bands: None,
+        efficacy_profile: None,
     })
 }
 

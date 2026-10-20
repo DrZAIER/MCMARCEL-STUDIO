@@ -60,8 +60,25 @@ the frontend location with `MCMARCEL_UI_DIR`.
 | `crates/mcmarcel-cli` | Headless `demo` / `validate` / `run` commands |
 | `src-tauri` | Tauri v2 desktop shell (excluded from the fast core workspace build) |
 | `ui` | React 19 + TypeScript + Vite front end |
-| `packs` | Exported country packs, including the synthetic demo |
+| `packs` | Country packs: the synthetic demo and the Belgian reference case |
+| `parity` | R oracle scripts, the parity fixtures and the Belgium reference test data |
 | `docs` | Architecture, model, evidence and pack-schema documentation |
+
+## The two packs that ship with Studio
+
+| Pack | What it is | Use it for |
+|------|------------|------------|
+| `tun-demo` — Tunisia (synthetic demo) | Entirely generated numbers | Exploring the interface; every run is stamped |
+| `bel-belx` — Belgium (BELX reference) | The reference case of the framework, built from the repository's Belgian input files | Reproducing and validating the model against the upstream fixture |
+
+Both are **synthetic in the sense that matters**: the Belgian input files in this repository carry
+stochastic perturbation for public release, so the Belgium pack is marked `SYNTHETIC` throughout,
+production mode stays blocked and every run is stamped. It is a methodological reference, not a
+country estimate. The pack is rebuilt from the R inputs with:
+
+```bash
+Rscript mcmarcel-rs/parity/build_belgium_pack.R
+```
 
 ## Documentation
 
@@ -83,13 +100,14 @@ the frontend location with `MCMARCEL_UI_DIR`.
 ## Development
 
 ```bash
-cargo test --workspace        # 11 engine tests, store round-trip, CLI behaviour
+cargo test --workspace        # 21 tests: engine, store, R parity and the Belgian reference
 cargo check --workspace
 cd ui && npm run build        # type-checks and bundles the front end
 ```
 
-The R implementation in the parent directory remains the **validation oracle**. It is never called
-at runtime; parity is checked against fixed R fixtures (see [docs/evidence-model.md](docs/evidence-model.md)).
+The R project in the parent directory remains the **validation oracle**. It is never called
+at runtime; parity is checked against fixed R fixtures and against the committed upstream
+Belgian reference outputs (see [docs/evidence-model.md](docs/evidence-model.md)).
 
 ## Licence
 

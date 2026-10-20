@@ -108,9 +108,51 @@ label is what the interface shows.
 | `hcfr_age` | 60 × 2 | Column 0 = hospital, column 1 = ICU |
 | `non_ma_sample_age` | n × 60 | Row = sample, column = age month |
 | `life_table` | 60 × 5 | `age_years, le, le_disc, hrqale, hrqale_disc` |
+| `cost_bands` | structure | Age-banded unit costs (see below) |
+| `efficacy_profile` | structure | Age-specific efficacy (see below) |
 
 Every asset is optional. When one is absent the engine generates a documented default and the
 validation report records that the pack relies on a generated asset.
+
+### `cost_bands`
+
+Unit costs can be defined per age band, the way the Belgian reference does. The values live in
+the parameter map (so they keep their evidence status and source); the structure only says which
+parameter belongs to which band:
+
+```json
+"cost_bands": {
+  "outpatient": [
+    { "max_age_months": 11, "mean_key": "cost_outpatient_under1y", "sd_key": "cost_outpatient_under1y_sd" }
+  ],
+  "hospital": [ ... ],
+  "icu": [ ... ],
+  "non_ma": [ ... ]
+}
+```
+
+The engine samples one unit cost per band and interpolates it over the age range, mirroring the
+`approx_age_by_sim` logic of the R implementation: a band applies from the previous break up to
+and including its own break.
+
+### `efficacy_profile`
+
+Efficacy can be age-specific, the way the trial-derived bootstrap files of the Belgian reference
+are:
+
+```json
+"efficacy_profile": {
+  "maternal": {
+    "hospital": { "mean": [ ... 60 values ... ], "sd": [ ... 60 values ... ] },
+    "outpatient": { ... }, "icu": { ... }, "death": { ... }, "non_ma": { ... }
+  },
+  "mab": { ... }
+}
+```
+
+A mean of zero means "no protection at that age", which is how the protection window is encoded.
+Without a profile the engine samples one value per outcome and applies it for the whole
+protection window (`duration_*_years`).
 
 ## `scenarios`
 

@@ -29,6 +29,8 @@ pub struct ServerConfig {
     pub db_path: PathBuf,
     /// Directory holding the built frontend (`ui/dist`).
     pub ui_dir: PathBuf,
+    /// Directory holding country packs to import at startup.
+    pub packs_dir: Option<PathBuf>,
     /// TCP port; `0` asks the OS for an ephemeral port.
     pub port: u16,
     /// Seed the synthetic demo pack when the library is empty.
@@ -46,11 +48,18 @@ impl ServerConfig {
             .unwrap_or_else(|_| {
                 std::env::current_dir().unwrap_or_default().join("ui").join("dist")
             });
+        let packs_dir = std::env::var("MCMARCEL_PACKS_DIR")
+            .ok()
+            .map(PathBuf::from)
+            .or_else(|| {
+                let candidate = std::env::current_dir().unwrap_or_default().join("packs");
+                candidate.is_dir().then_some(candidate)
+            });
         let port = std::env::var("MCMARCEL_PORT")
             .ok()
             .and_then(|value| value.parse::<u16>().ok())
             .unwrap_or(8787);
-        Self { db_path, ui_dir, port, seed_demo: true }
+        Self { db_path, ui_dir, packs_dir, port, seed_demo: true }
     }
 }
 
@@ -193,6 +202,7 @@ pub async fn serve(config: ServerConfig) -> Result<RunningServer, Box<dyn std::e
         store.save_country(&pack, RunMode::Fixture)?;
         tracing::info!("seeded synthetic Tunisia demo pack");
     }
+    import_packs(&store, config.packs_dir.as_deref())?;
 
     let app = build_router(store, &config.ui_dir);
     let address = SocketAddr::from(([127, 0, 0, 1], config.port));
@@ -205,6 +215,40 @@ pub async fn serve(config: ServerConfig) -> Result<RunningServer, Box<dyn std::e
         }
     });
     Ok(RunningServer { addr, handle })
+}
+
+/// Import every country pack in `packs_dir` that is not in the library yet.
+fn import_packs(store: &Store, packs_dir: Option<&std::path::Path>) -> Result<(), Box<dyn std::error::Error>> {
+    let Some(directory) = packs_dir else { return Ok(()) };
+    let Ok(entries) = std::fs::read_dir(directory) else { return Ok(()) };
+    let mut paths: Vec<PathBuf> = entries
+        .filter_map(|entry| entry.ok())
+        .map(|entry| entry.path())
+        .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("json"))
+        .collect();
+    paths.sort();
+    for path in paths {
+        let pack = match CountryPack::from_json_file(&path) {
+            Ok(pack) => pack,
+            Err(error) => {
+                tracing::warn!("skipping {}: {error}", path.display());
+                continue;
+            }
+        };
+        if store.get_country(&pack.country.id)?.is_some() {
+            continue;
+        }
+        // Imported packs keep their own evidence: a pack with blocking evidence
+        // stays in fixture mode.
+        let mode = if pack.parameters.values().any(|p| p.status.blocks_production()) {
+            RunMode::Fixture
+        } else {
+            RunMode::Production
+        };
+        store.save_country(&pack, mode)?;
+        tracing::info!("imported country pack {} from {}", pack.country.id, path.display());
+    }
+    Ok(())
 }
 
 async fn health(State(state): State<AppState>) -> Json<HealthResponse> {

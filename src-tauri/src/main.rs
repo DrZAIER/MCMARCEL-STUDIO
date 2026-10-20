@@ -91,7 +91,19 @@ fn resolve_config(app: &tauri::AppHandle) -> ServerConfig {
         .map(PathBuf::from)
         .unwrap_or_else(|_| resolve_ui_dir(app));
 
-    ServerConfig { db_path, ui_dir, port: 0, seed_demo: true }
+    let packs_dir = std::env::var("MCMARCEL_PACKS_DIR")
+        .map(PathBuf::from)
+        .or_else(|| {
+            let candidate = app
+                .path()
+                .resource_dir()
+                .ok()
+                .map(|dir| dir.join("packs"))
+                .filter(|dir| dir.is_dir());
+            candidate
+        });
+
+    ServerConfig { db_path, ui_dir, packs_dir, port: 0, seed_demo: true }
 }
 
 /// Find the built frontend: bundled resources first, then a development checkout.

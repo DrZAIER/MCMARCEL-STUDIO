@@ -81,24 +81,66 @@ it is created.
 ## The R oracle
 
 The R implementation in the parent directory is the validation oracle and is never a runtime
-dependency. Parity is established with fixed R fixtures:
+dependency. Parity is established on two levels.
 
-* `parity/oracle_case_001.R` recomputes a set of shared quantities by calling the R
-  implementation's own functions (`time_age_to_cohort_age`, `get_protection_by_cohort`,
-  `compute_unit_price`, `sample_rgamma`, `approx_age_by_sim`, `get_net_benefit`) and writes
-  `parity/expected/case_001.json`, recording the R version that produced it.
-* `crates/mcmarcel-core/tests/parity.rs` recomputes the same quantities with the Rust engine and
-  asserts that they agree, so the fixture is part of the normal test cycle:
+### 1. Formula parity
 
-  ```bash
-  cargo test -p mcmarcel-core --test parity
-  ```
+`parity/oracle_case_001.R` recomputes a set of shared quantities by calling the R
+implementation's own functions (`time_age_to_cohort_age`, `get_protection_by_cohort`,
+`compute_unit_price`, `sample_rgamma`, `approx_age_by_sim`, `get_net_benefit`) and writes
+`parity/expected/case_001.json`, recording the R version that produced it.
+`crates/mcmarcel-core/tests/parity.rs` recomputes the same quantities with the Rust engine and
+asserts that they agree, so the fixture is part of the normal test cycle:
 
-* To refresh the fixture after an intentional change:
+```bash
+cargo test -p mcmarcel-core --test parity
+```
 
-  ```bash
-  Rscript parity/oracle_case_001.R
-  ```
+To refresh the fixture after an intentional change:
+
+```bash
+Rscript parity/oracle_case_001.R
+```
+
+### 2. The Belgian reference case
+
+The Belgian base case is the reference of the framework: the R implementation reproduces it
+byte-identically (`tests/test_regression_belgium.R`) and the committed upstream fixture
+(`tests/reference/belgium_upstream/`) holds the expected numbers.
+
+`parity/build_belgium_pack.R` reads the same Belgian input files with the same transformations
+as the R model and writes `packs/belgium-belx.json`: the 60 × 12 hospital and ICU matrices, the
+outpatient and non-medically-attended samples, the hCFR profile, the Belgian 2023 life table, the
+age-banded unit costs, the age-specific efficacy profiles and the ten upstream scenarios.
+
+`parity/extract_belgium_reference.R` copies the upstream means into
+`parity/expected/belgium_reference.json`, and
+`crates/mcmarcel-core/tests/belgium_reference.rs` runs the Rust engine on the pack and compares
+it with those numbers:
+
+```bash
+cargo test -p mcmarcel-core --test belgium_reference
+```
+
+The tolerances (5 % on cases, hospital admissions and QALYs, 10 % on deaths and the incremental
+cost) cover the difference between the two implementations — independent random streams, the
+corrected fractional-year discounting of life expectancy — and the Monte Carlo error of the 20
+upstream simulations. The intervention cost has to match to within 0.1 %, because it is
+deterministic.
+
+The comparison found two real defects in the rewrite, both now fixed and covered by the test:
+
+* the maternal vaccine wrongly received the monoclonal antibody's catch-up coverage, which
+  overstated the averted burden of every catch-up programme by about a third;
+* the cost-effectiveness layer applied the extended-dominance rule before removing the simply
+  dominated strategies, which mislabelled the whole frontier of a ten-scenario comparison.
+
+### 3. The perturbed public-release inputs
+
+The Belgian input files in this repository carry stochastic perturbation (the files with an `X`
+in their name). The pack therefore marks every perturbed value as `SYNTHETIC`: production mode
+stays blocked and every run carries the fixture stamp. The pack is a **methodological reference**,
+not a country estimate.
 
 The R code additionally documents the C1–C16 defect fixes that the rewrite had to preserve. The
 differences that the rewrite deliberately introduces are listed in

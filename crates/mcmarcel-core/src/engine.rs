@@ -77,12 +77,16 @@ struct DrawOutput {
     points: Vec<DrawPoint>,
 }
 
+/// Unit costs of a draw, one value per age month.
+///
+/// A pack with age-banded costs produces a different value per band; a pack with
+/// a single cost per category repeats that value over the whole age range.
 #[derive(Debug, Clone)]
 struct CostSamples {
-    outpatient: f64,
-    hospital: f64,
-    icu: f64,
-    non_ma: f64,
+    outpatient: Vec<f64>,
+    hospital: Vec<f64>,
+    icu: Vec<f64>,
+    non_ma: Vec<f64>,
 }
 
 #[derive(Debug, Clone)]
@@ -94,11 +98,11 @@ struct QalySamples {
 
 #[derive(Debug, Clone)]
 struct SampledEfficacy {
-    hospital: f64,
-    outpatient: f64,
-    icu: f64,
-    death: f64,
-    non_ma: f64,
+    hospital: Vec<f64>,
+    outpatient: Vec<f64>,
+    icu: Vec<f64>,
+    death: Vec<f64>,
+    non_ma: Vec<f64>,
 }
 
 #[derive(Debug, Clone)]
@@ -133,12 +137,7 @@ fn run_draw(pack: &CountryPack, inputs: &ModelInputs, spec: &RunSpec, draw: u32)
 
     let baseline = build_baseline(inputs, &mut rng, draw)?;
 
-    let costs = CostSamples {
-        outpatient: rng.gamma(inputs.costs.outpatient.mean, inputs.costs.outpatient.sd),
-        hospital: rng.gamma(inputs.costs.hospital.mean, inputs.costs.hospital.sd),
-        icu: rng.gamma(inputs.costs.icu.mean, inputs.costs.icu.sd),
-        non_ma: rng.gamma(inputs.costs.non_ma.mean, inputs.costs.non_ma.sd),
-    };
+    let costs = sample_costs(inputs, &mut rng);
     let qaly = QalySamples {
         outpatient: rng.gamma(inputs.qaly.outpatient.mean, inputs.qaly.outpatient.sd),
         hospital: rng.gamma(inputs.qaly.hospital.mean, inputs.qaly.hospital.sd),
@@ -157,16 +156,17 @@ fn run_draw(pack: &CountryPack, inputs: &ModelInputs, spec: &RunSpec, draw: u32)
     for scenario in &pack.scenarios {
         let maternal_protection = protection_matrices(
             &maternal_efficacy,
-            inputs.maternal.duration_months,
             scenario,
             scenario.coverage_maternal * (1.0 - inputs.pre_term_rate),
+            // The maternal vaccine is given at birth: catch-up never applies to it.
+            0.0,
             inputs,
         );
         let mab_protection = protection_matrices(
             &mab_efficacy,
-            inputs.mab.duration_months,
             scenario,
             scenario.coverage_mab,
+            scenario.coverage_catch_up,
             inputs,
         );
 
@@ -184,10 +184,17 @@ fn run_draw(pack: &CountryPack, inputs: &ModelInputs, spec: &RunSpec, draw: u32)
         let maternal_doses = dose_count(
             scenario,
             scenario.coverage_maternal * (1.0 - inputs.pre_term_rate),
+            0.0,
             inputs.births * (1.0 + inputs.stillbirth_rate),
             inputs,
         );
-        let mab_doses = dose_count(scenario, scenario.coverage_mab, inputs.target_population, inputs);
+        let mab_doses = dose_count(
+            scenario,
+            scenario.coverage_mab,
+            scenario.coverage_catch_up,
+            inputs.target_population,
+            inputs,
+        );
 
         let maternal_unit = unit_price(
             inputs.maternal.administration_cost,
@@ -360,18 +367,18 @@ struct ProtectionMatrices {
 
 fn protection_matrices(
     efficacy: &SampledEfficacy,
-    duration_months: usize,
     scenario: &Scenario,
     coverage: f64,
+    coverage_catch_up: f64,
     inputs: &ModelInputs,
 ) -> ProtectionMatrices {
     let _ = inputs;
     ProtectionMatrices {
-        hospital: protection_by_cohort(&efficacy_vector(efficacy.hospital, duration_months), scenario.intervention_start, scenario.intervention_end, coverage, scenario.coverage_catch_up),
-        outpatient: protection_by_cohort(&efficacy_vector(efficacy.outpatient, duration_months), scenario.intervention_start, scenario.intervention_end, coverage, scenario.coverage_catch_up),
-        non_ma: protection_by_cohort(&efficacy_vector(efficacy.non_ma, duration_months), scenario.intervention_start, scenario.intervention_end, coverage, scenario.coverage_catch_up),
-        icu: protection_by_cohort(&efficacy_vector(efficacy.icu, duration_months), scenario.intervention_start, scenario.intervention_end, coverage, scenario.coverage_catch_up),
-        death: protection_by_cohort(&efficacy_vector(efficacy.death, duration_months), scenario.intervention_start, scenario.intervention_end, coverage, scenario.coverage_catch_up),
+        hospital: protection_by_cohort(&efficacy.hospital, scenario.intervention_start, scenario.intervention_end, coverage, coverage_catch_up),
+        outpatient: protection_by_cohort(&efficacy.outpatient, scenario.intervention_start, scenario.intervention_end, coverage, coverage_catch_up),
+        non_ma: protection_by_cohort(&efficacy.non_ma, scenario.intervention_start, scenario.intervention_end, coverage, coverage_catch_up),
+        icu: protection_by_cohort(&efficacy.icu, scenario.intervention_start, scenario.intervention_end, coverage, coverage_catch_up),
+        death: protection_by_cohort(&efficacy.death, scenario.intervention_start, scenario.intervention_end, coverage, coverage_catch_up),
     }
 }
 
@@ -459,14 +466,14 @@ pub fn protection_by_cohort(
     protection
 }
 
-fn dose_count(scenario: &Scenario, coverage: f64, population: f64, inputs: &ModelInputs) -> f64 {
+fn dose_count(scenario: &Scenario, coverage: f64, coverage_catch_up: f64, population: f64, inputs: &ModelInputs) -> f64 {
     let _ = inputs;
-    if coverage <= 0.0 {
+    if coverage <= 0.0 && coverage_catch_up <= 0.0 {
         return 0.0;
     }
     let mut dose_vector = vec![0.0; AGE_MONTHS];
     dose_vector[0] = 1.0;
-    let matrix = protection_by_cohort(&dose_vector, scenario.intervention_start, scenario.intervention_end, coverage, scenario.coverage_catch_up);
+    let matrix = protection_by_cohort(&dose_vector, scenario.intervention_start, scenario.intervention_end, coverage, coverage_catch_up);
     matrix.total() * population / 12.0
 }
 
@@ -494,13 +501,39 @@ fn medical_cost(hospital: &[f64], icu: &[f64], outpatient: &[f64], non_ma: &[f64
     let mut total = 0.0;
     for age in 0..AGE_MONTHS {
         let discount = discount_factor(age, inputs.discount_cost);
-        total += (hospital[age] * costs.hospital
-            + icu[age] * costs.icu
-            + outpatient[age] * costs.outpatient
-            + non_ma[age] * costs.non_ma)
+        total += (hospital[age] * costs.hospital[age]
+            + icu[age] * costs.icu[age]
+            + outpatient[age] * costs.outpatient[age]
+            + non_ma[age] * costs.non_ma[age])
             * discount;
     }
     total
+}
+
+/// Sample the unit costs of a draw, by age band when the pack defines them.
+fn sample_costs(inputs: &ModelInputs, rng: &mut DrawRng) -> CostSamples {
+    let banded = &inputs.banded_costs;
+    fn sample_category(
+        rng: &mut DrawRng,
+        bands: &[crate::model::ResolvedCostBand],
+        fallback: crate::model::UncertainValue,
+    ) -> Vec<f64> {
+        if bands.is_empty() {
+            let value = rng.gamma(fallback.mean, fallback.sd);
+            return vec![value; AGE_MONTHS];
+        }
+        let sampled: Vec<f64> = bands
+            .iter()
+            .map(|band| rng.gamma(band.mean, band.sd))
+            .collect();
+        crate::model::interpolate_cost_bands(bands, &sampled)
+    }
+    CostSamples {
+        outpatient: sample_category(rng, banded.category("outpatient"), inputs.costs.outpatient),
+        hospital: sample_category(rng, banded.category("hospital"), inputs.costs.hospital),
+        icu: sample_category(rng, banded.category("icu"), inputs.costs.icu),
+        non_ma: sample_category(rng, banded.category("non_ma"), inputs.costs.non_ma),
+    }
 }
 
 fn qaly_burden(hospital: &[f64], icu: &[f64], outpatient: &[f64], non_ma: &[f64], deaths: &[f64], qaly: &QalySamples, inputs: &ModelInputs) -> f64 {
@@ -524,7 +557,22 @@ pub fn discount_factor(age_month: usize, rate: f64) -> f64 {
     1.0 / (1.0 + rate).powi(years)
 }
 
+/// Sample the efficacy of a draw, by age month when the pack defines a profile.
+///
+/// Without a profile the engine samples one value per outcome and applies it for
+/// the whole protection window, as the R implementation does when mean and
+/// standard deviation are given. With a profile (the Belgian reference case),
+/// every age month keeps its own mean and standard deviation.
 fn sample_efficacy(set: &EfficacySet, rng: &mut DrawRng) -> SampledEfficacy {
+    if let Some(profile) = set.profile.as_ref() {
+        return SampledEfficacy {
+            hospital: sample_profile(&profile.hospital, rng),
+            outpatient: sample_profile(&profile.outpatient, rng),
+            icu: sample_profile(&profile.icu, rng),
+            death: sample_profile(&profile.death, rng),
+            non_ma: sample_profile(&profile.non_ma, rng),
+        };
+    }
     let hospital = rng.beta(set.hospital.mean, set.hospital.sd);
     let outpatient = if same(set.outpatient, set.hospital) {
         hospital
@@ -546,14 +594,36 @@ fn sample_efficacy(set: &EfficacySet, rng: &mut DrawRng) -> SampledEfficacy {
     } else {
         rng.beta(set.death.mean, set.death.sd)
     };
-    SampledEfficacy { hospital, outpatient, icu, death, non_ma }
+    SampledEfficacy {
+        hospital: vec![hospital; AGE_MONTHS],
+        outpatient: vec![outpatient; AGE_MONTHS],
+        icu: vec![icu; AGE_MONTHS],
+        death: vec![death; AGE_MONTHS],
+        non_ma: vec![non_ma; AGE_MONTHS],
+    }
+}
+
+/// Sample an age-specific efficacy profile.
+fn sample_profile(profile: &crate::types::EfficacyByAge, rng: &mut DrawRng) -> Vec<f64> {
+    let mut values = vec![0.0; AGE_MONTHS];
+    for age in 0..AGE_MONTHS {
+        let Some(mean) = profile.mean.get(age).copied() else { break };
+        if mean <= 0.0 {
+            continue;
+        }
+        let sd = profile.sd.get(age).copied().unwrap_or(0.0);
+        values[age] = rng.beta(mean, sd);
+    }
+    values
 }
 
 fn same(a: UncertainValue, b: UncertainValue) -> bool {
     (a.mean - b.mean).abs() < 1e-12 && (a.sd - b.sd).abs() < 1e-12
 }
 
-fn efficacy_vector(value: f64, duration_months: usize) -> Vec<f64> {
+/// Protection by age: the sampled efficacy for the first `duration_months`
+/// months of age, zero afterwards.
+pub fn efficacy_by_age(value: f64, duration_months: usize) -> Vec<f64> {
     let mut vector = vec![0.0; AGE_MONTHS];
     for item in vector.iter_mut().take(duration_months.min(AGE_MONTHS)) {
         *item = value;

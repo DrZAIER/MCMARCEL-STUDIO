@@ -32,7 +32,7 @@ The engine has no I/O dependencies and is the only place where modelling decisio
 |--------|----------------|
 | `types` | `CountryPack`, `Parameter`, `Scenario`, `Matrix`, `Assets`, `RunSpec`, `RunResult`, `ValidationReport` |
 | `pack` | Demo pack construction and country-pack helpers (identity, hashing, JSON I/O) |
-| `model` | Assembles model inputs from a pack, generates derived assets when a pack omits them |
+| `model` | Assembles model inputs from a pack, generates derived assets when a pack omits them, resolves age-banded costs |
 | `rng` | Deterministic ChaCha8 stream, gamma/beta/normal sampling, paired draws |
 | `engine` | Monthly cohort simulation, burden, costs, QALYs, discounting, aggregation |
 | `analysis` | ICER table, dominance and frontier detection, INMB grid, P\* thresholds |
@@ -63,6 +63,9 @@ Three tables: `countries` (pack JSON + mode), `runs` (status, seed, draws, resul
   against a pack that is not production-ready is rejected with `400`.
 * Responses carry `Content-Security-Policy`, `X-Content-Type-Options: nosniff` and
   `Referrer-Policy: no-referrer`.
+* On startup the server imports every country pack in `packs/` (or `MCMARCEL_PACKS_DIR`) that is
+  not in the library yet, so the shipped packs — the synthetic demo and the Belgian reference —
+  are available in the interface straight away.
 
 ### `mcmarcel-cli`
 

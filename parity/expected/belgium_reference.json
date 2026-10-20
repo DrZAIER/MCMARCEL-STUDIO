@@ -1,0 +1,124 @@
+{
+  "fixture": "belgium_upstream",
+  "source": "tests/reference/belgium_upstream/RSV_BELX_basecase_summary_statistics_mean.csv",
+  "description": "Mean values of the upstream Belgian base case (20 simulations, seed 20190118). The Rust engine is compared against these numbers with a documented tolerance:",
+  "tolerance": {
+    "cases": 0.05,
+    "hospital": 0.05,
+    "deaths": 0.1,
+    "qaly": 0.05,
+    "incremental_cost": 0.1
+  },
+  "scenarios": [
+    {
+      "scenario_id": 1,
+      "intervention": "maternal",
+      "scenario": "basecase",
+      "total_cases_disc_averted": 4219.51,
+      "hosp_cases_disc_averted": 900.82,
+      "rsv_deaths_disc_averted": 0.98,
+      "total_QALY_disc_averted": 66.88,
+      "intervention_cost_program": 8086226.72,
+      "incremental_cost_disc_program": 3408278.12
+    },
+    {
+      "scenario_id": 2,
+      "intervention": "maternal_SepMar",
+      "scenario": "basecase",
+      "total_cases_disc_averted": 2969.91,
+      "hosp_cases_disc_averted": 765.21,
+      "rsv_deaths_disc_averted": 0.84,
+      "total_QALY_disc_averted": 53.91,
+      "intervention_cost_program": 4716965.59,
+      "incremental_cost_disc_program": 754038.04
+    },
+    {
+      "scenario_id": 3,
+      "intervention": "mAb",
+      "scenario": "basecase",
+      "total_cases_disc_averted": 14845.07,
+      "hosp_cases_disc_averted": 3415.23,
+      "rsv_deaths_disc_averted": 2.44,
+      "total_QALY_disc_averted": 193.21,
+      "intervention_cost_program": 76056654.96,
+      "incremental_cost_disc_program": 61008073.92
+    },
+    {
+      "scenario_id": 4,
+      "intervention": "mAb_OctMar",
+      "scenario": "basecase",
+      "total_cases_disc_averted": 5999.72,
+      "hosp_cases_disc_averted": 1758.27,
+      "rsv_deaths_disc_averted": 1.57,
+      "total_QALY_disc_averted": 104.8,
+      "intervention_cost_program": 38028327.48,
+      "incremental_cost_disc_program": 29577222.65
+    },
+    {
+      "scenario_id": 5,
+      "intervention": "mAb_OctMar_CB",
+      "scenario": "basecase",
+      "total_cases_disc_averted": 17784.62,
+      "hosp_cases_disc_averted": 3876.77,
+      "rsv_deaths_disc_averted": 2.64,
+      "total_QALY_disc_averted": 218.33,
+      "intervention_cost_program": 76056654.96,
+      "incremental_cost_disc_program": 59142192.42
+    },
+    {
+      "scenario_id": 6,
+      "intervention": "maternal",
+      "scenario": "cost_parity",
+      "total_cases_disc_averted": 4219.51,
+      "hosp_cases_disc_averted": 900.82,
+      "rsv_deaths_disc_averted": 0.98,
+      "total_QALY_disc_averted": 66.88,
+      "intervention_cost_program": 8694400,
+      "incremental_cost_disc_program": 4016451.4
+    },
+    {
+      "scenario_id": 7,
+      "intervention": "maternal_SepMar",
+      "scenario": "cost_parity",
+      "total_cases_disc_averted": 2969.91,
+      "hosp_cases_disc_averted": 765.21,
+      "rsv_deaths_disc_averted": 0.84,
+      "total_QALY_disc_averted": 53.91,
+      "intervention_cost_program": 5071733.33,
+      "incremental_cost_disc_program": 1108805.79
+    },
+    {
+      "scenario_id": 8,
+      "intervention": "mAb",
+      "scenario": "cost_parity",
+      "total_cases_disc_averted": 14845.07,
+      "hosp_cases_disc_averted": 3415.23,
+      "rsv_deaths_disc_averted": 2.44,
+      "total_QALY_disc_averted": 193.21,
+      "intervention_cost_program": 19562400,
+      "incremental_cost_disc_program": 4513818.96
+    },
+    {
+      "scenario_id": 9,
+      "intervention": "mAb_OctMar",
+      "scenario": "cost_parity",
+      "total_cases_disc_averted": 5999.72,
+      "hosp_cases_disc_averted": 1758.27,
+      "rsv_deaths_disc_averted": 1.57,
+      "total_QALY_disc_averted": 104.8,
+      "intervention_cost_program": 9781200,
+      "incremental_cost_disc_program": 1330095.17
+    },
+    {
+      "scenario_id": 10,
+      "intervention": "mAb_OctMar_CB",
+      "scenario": "cost_parity",
+      "total_cases_disc_averted": 17784.62,
+      "hosp_cases_disc_averted": 3876.77,
+      "rsv_deaths_disc_averted": 2.64,
+      "total_QALY_disc_averted": 218.33,
+      "intervention_cost_program": 19562400,
+      "incremental_cost_disc_program": 2647937.46
+    }
+  ]
+}

@@ -7,13 +7,6 @@ use crate::Error;
 
 const REQUIRED_PARAMETERS: &[&str] = &[
     "births",
-    "incidence_hospital_0_5m",
-    "incidence_hospital_6_11m",
-    "ratio_outpatient_hospital",
-    "proportion_non_medical_attended",
-    "icu_share_of_hospital",
-    "cfr_hospital",
-    "cfr_icu",
     "cost_outpatient",
     "cost_hospital",
     "cost_icu",
@@ -41,9 +34,36 @@ const REQUIRED_PARAMETERS: &[&str] = &[
     "duration_mab_years",
     "discount_rate_cost",
     "discount_rate_effect",
-    "life_expectancy_years",
     "qol_mean",
 ];
+
+/// Scalar summaries that are only needed when the engine has to generate the
+/// corresponding asset. A pack that ships the asset itself (a country data
+/// file, for instance) does not have to repeat the number as a parameter.
+fn conditionally_required(pack: &CountryPack) -> Vec<&'static str> {
+    let mut keys = Vec::new();
+    if pack.assets.hospital_age_calendar.is_none() {
+        keys.push("incidence_hospital_0_5m");
+        keys.push("incidence_hospital_6_11m");
+    }
+    if pack.assets.outpatient_rate_age_sample.is_none() {
+        keys.push("ratio_outpatient_hospital");
+    }
+    if pack.assets.non_ma_sample_age.is_none() {
+        keys.push("proportion_non_medical_attended");
+    }
+    if pack.assets.icu_age_calendar.is_none() {
+        keys.push("icu_share_of_hospital");
+    }
+    if pack.assets.hcfr_age.is_none() {
+        keys.push("cfr_hospital");
+        keys.push("cfr_icu");
+    }
+    if pack.assets.life_table.is_none() {
+        keys.push("life_expectancy_years");
+    }
+    keys
+}
 
 pub fn validate_pack(pack: &CountryPack, mode: RunMode) -> ValidationReport {
     let mut issues = Vec::new();
@@ -60,7 +80,7 @@ pub fn validate_pack(pack: &CountryPack, mode: RunMode) -> ValidationReport {
         production_ready = false;
     }
 
-    for key in REQUIRED_PARAMETERS {
+    for key in REQUIRED_PARAMETERS.iter().chain(conditionally_required(pack).iter()) {
         match pack.parameters.get(*key) {
             None => {
                 issues.push(ValidationIssue {
