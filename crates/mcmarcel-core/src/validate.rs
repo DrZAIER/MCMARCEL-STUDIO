@@ -93,7 +93,17 @@ pub fn validate_pack(pack: &CountryPack, mode: RunMode) -> ValidationReport {
                 production_ready = false;
             }
             Some(param) => {
-                if param.as_f64().is_none() {
+                let value_is_null = param.value.as_ref().map(|value| value.is_null()).unwrap_or(true);
+                if value_is_null {
+                    issues.push(ValidationIssue {
+                        severity: Severity::Error,
+                        code: "parameter.no_value".into(),
+                        message: format!("Parameter '{}' has no value yet.", param.key),
+                        parameter: Some(param.key.clone()),
+                        blocks_production: true,
+                    });
+                    production_ready = false;
+                } else if param.as_f64().is_none() {
                     issues.push(ValidationIssue {
                         severity: Severity::Error,
                         code: "parameter.not_numeric".into(),

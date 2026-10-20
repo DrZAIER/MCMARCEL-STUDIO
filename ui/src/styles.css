@@ -295,6 +295,28 @@ td strong { font-weight: 650; }
 .countries-layout { display: grid; grid-template-columns: 292px minmax(0, 1fr); gap: 18px; align-items: start; }
 .country-list { position: sticky; top: 18px; background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: 16px; max-height: calc(100vh - 48px); overflow: auto; }
 .country-cards { display: flex; flex-direction: column; gap: 9px; }
+.country-search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  margin-bottom: 10px;
+  color: var(--muted);
+}
+.country-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.86rem;
+  color: var(--ink);
+  outline: none;
+}
+.country-search .icon-button { padding: 0 4px; font-size: 1.1rem; }
 .country-card { display: flex; flex-direction: column; gap: 4px; width: 100%; text-align: left; padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-2); color: var(--ink); transition: border 140ms ease, background 140ms ease, transform 140ms ease; }
 .country-card:hover { border-color: var(--brand-2); transform: translateY(-1px); }
 .country-card.active { border-color: var(--brand); background: #eef6f2; box-shadow: inset 3px 0 0 var(--brand); }

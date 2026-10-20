@@ -1,0 +1,59 @@
+"iso3","name","un_name","currency","region","gavi_status","gavi_list_year"
+"AFG","Afghanistan","Afghanistan","AFN","Southern Asia","eligible",2020
+"BGD","Bangladesh","Bangladesh","BDT","Southern Asia","eligible",2020
+"BEN","Benin","Benin","XOF","Western Africa","eligible",2020
+"BFA","Burkina Faso","Burkina Faso","XOF","Western Africa","eligible",2020
+"BDI","Burundi","Burundi","BIF","Eastern Africa","eligible",2020
+"KHM","Cambodia","Cambodia","KHR","South-Eastern Asia","eligible",2020
+"CMR","Cameroon","Cameroon","XAF","Middle Africa","eligible",2020
+"CAF","Central African Republic","Central African Republic","XAF","Middle Africa","eligible",2020
+"TCD","Chad","Chad","XAF","Middle Africa","eligible",2020
+"COM","Comoros","Comoros","KMF","Eastern Africa","eligible",2020
+"CIV","Cote d'Ivoire","Côte d’Ivoire","XOF","Western Africa","eligible",2020
+"PRK","Democratic Republic of Korea","Democratic People’s Republic of Korea","KPW","Eastern Asia","eligible",2020
+"COD","Democratic Republic of the Congo","Democratic Republic of the Congo","CDF","Middle Africa","eligible",2020
+"DJI","Djibouti","Djibouti","DJF","Eastern Africa","eligible",2020
+"ERI","Eritrea","Eritrea","ERN","Eastern Africa","eligible",2020
+"ETH","Ethiopia","Ethiopia","ETB","Eastern Africa","eligible",2020
+"GMB","Gambia","Gambia","GMD","Western Africa","eligible",2020
+"GHA","Ghana","Ghana","GHS","Western Africa","eligible",2020
+"GIN","Guinea","Guinea","GNF","Western Africa","eligible",2020
+"GNB","Guinea Bissau","Guinea-Bissau","XOF","Western Africa","eligible",2020
+"HTI","Haiti","Haiti","HTG","Caribbean","eligible",2020
+"IND","India","India","INR","Southern Asia","eligible",2020
+"KEN","Kenya","Kenya","KES","Eastern Africa","eligible",2020
+"KGZ","Kyrgyzstan","Kyrgyzstan","KGS","Central Asia","eligible",2020
+"LAO","Lao People's Democratic Republic","Lao People’s Democratic Republic","LAK","South-Eastern Asia","eligible",2020
+"LSO","Lesotho","Lesotho","LSL","Southern Africa","eligible",2020
+"LBR","Liberia","Liberia","LRD","Western Africa","eligible",2020
+"MDG","Madagascar","Madagascar","MGA","Eastern Africa","eligible",2020
+"MWI","Malawi","Malawi","MWK","Eastern Africa","eligible",2020
+"MLI","Mali","Mali","XOF","Western Africa","eligible",2020
+"MRT","Mauritania","Mauritania","MRU","Western Africa","eligible",2020
+"MOZ","Mozambique","Mozambique","MZN","Eastern Africa","eligible",2020
+"MMR","Myanmar","Myanmar","MMK","South-Eastern Asia","eligible",2020
+"NPL","Nepal","Nepal","NPR","Southern Asia","eligible",2020
+"NIC","Nicaragua","Nicaragua","NIO","Central America","eligible",2020
+"NER","Niger","Niger","XOF","Western Africa","eligible",2020
+"NGA","Nigeria","Nigeria","NGN","Western Africa","eligible",2020
+"PAK","Pakistan","Pakistan","PKR","Southern Asia","eligible",2020
+"PNG","Papua New Guinea","Papua New Guinea","PGK","Melanesia","eligible",2020
+"COG","Republic of Congo","Congo","XAF","Middle Africa","eligible",2020
+"SDN","Republic of Sudan","Sudan","SDG","Northern Africa","eligible",2020
+"RWA","Rwanda","Rwanda","RWF","Eastern Africa","eligible",2020
+"STP","Sao Tome and Principe","Sao Tome and Principe","STN","Middle Africa","eligible",2020
+"SEN","Senegal","Senegal","XOF","Western Africa","eligible",2020
+"SLE","Sierra Leone","Sierra Leone","SLE","Western Africa","eligible",2020
+"SLB","Solomon Islands","Solomon Islands","SBD","Melanesia","eligible",2020
+"SOM","Somalia","Somalia","SOS","Eastern Africa","eligible",2020
+"SSD","South Sudan","South Sudan","SSP","Northern Africa","eligible",2020
+"SYR","Syria","Syrian Arab Republic","SYP","Western Asia","eligible",2020
+"TJK","Tajikistan","Tajikistan","TJS","Central Asia","eligible",2020
+"TZA","Tanzania","United Republic of Tanzania","TZS","Eastern Africa","eligible",2020
+"TGO","Togo","Togo","XOF","Western Africa","eligible",2020
+"UGA","Uganda","Uganda","UGX","Eastern Africa","eligible",2020
+"UZB","Uzbekistan","Uzbekistan","UZS","Central Asia","eligible",2020
+"VNM","Vietnam","Viet Nam","VND","South-Eastern Asia","eligible",2020
+"YEM","Yemen","Yemen","YER","Western Asia","eligible",2020
+"ZMB","Zambia","Zambia","ZMW","Eastern Africa","eligible",2020
+"ZWE","Zimbabwe","Zimbabwe","ZWG","Eastern Africa","eligible",2020

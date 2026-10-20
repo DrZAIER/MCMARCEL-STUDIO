@@ -8,6 +8,7 @@ const paths: Record<string, ReactNode> = {
   chart: <><path d="M4 19V5M4 19h16" /><path d="m7 15 3-4 3 2 5-7" /></>,
   book: <><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5Z" /><path d="M4 18.5A2.5 2.5 0 0 1 6.5 16H20" /></>,
   plus: <><path d="M12 5v14M5 12h14" /></>,
+  search: <><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></>,
   save: <><path d="M5 3h12l4 4v14H3V3Z" /><path d="M7 3v6h9V3M7 21v-7h10v7" /></>,
   check: <><path d="m4 12 5 5L20 6" /></>,
   warning: <><path d="M12 3 2.5 20h19Z" /><path d="M12 9v5M12 17.5v.1" /></>,

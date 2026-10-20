@@ -72,25 +72,34 @@ the frontend location with `MCMARCEL_UI_DIR`.
 | `crates/mcmarcel-cli` | Headless `demo` / `validate` / `run` commands |
 | `src-tauri` | Tauri v2 desktop shell (excluded from the fast core workspace build) |
 | `ui` | React 19 + TypeScript + Vite front end |
-| `packs` | Country packs: the synthetic demo and the Belgian reference case |
+| `packs` | Country packs: the synthetic demo, the Belgian reference case and the 58 Gavi countries |
+| `countries` | The Gavi country catalogue (ISO3, currency, region, source and year) |
 | `parity` | R oracle scripts, the parity fixtures and the Belgium reference test data |
-| `docs` | Architecture, model, evidence and pack-schema documentation |
+| `docs` | Architecture, model, evidence, pack-schema, questionnaire and Gavi documentation |
 
-## The two packs that ship with Studio
+## The packs that ship with Studio
 
 | Pack | What it is | Use it for |
-|------|------------|------------|
+|------|------------|-------------|
 | `tun-demo` — Tunisia (synthetic demo) | Entirely generated numbers | Exploring the interface; every run is stamped |
 | `bel-belx` — Belgium (BELX reference) | The reference case of the framework, built from the repository's Belgian input files | Reproducing and validating the model against the upstream fixture |
+| `packs/gavi/*.json` — 58 Gavi countries | The Gavi-eligible countries of the 2020 list, with the life table, the births, the life expectancy and the GDP per capita derived from public sources | Starting a country study: everything else waits for country evidence |
 
-Both are **synthetic in the sense that matters**: the Belgian input files in this repository carry
-stochastic perturbation for public release, so the Belgium pack is marked `SYNTHETIC` throughout,
-production mode stays blocked and every run is stamped. It is a methodological reference, not a
-country estimate. The pack is rebuilt from the R inputs with:
+All of them are **synthetic in the sense that matters**: the Belgian input files in this
+repository carry stochastic perturbation, and the Gavi packs have no incidence, cost or efficacy
+evidence yet. Production mode stays blocked and every run is stamped. They are methodological
+starting points, not country estimates.
+
+The packs are rebuilt from the R inputs with:
 
 ```bash
 Rscript mcmarcel-rs/parity/build_belgium_pack.R
+Rscript mcmarcel-rs/parity/build_gavi_catalogue.R mcmarcel-rs/countries/gavi-2020.csv
+Rscript mcmarcel-rs/parity/build_gavi_packs.R
 ```
+
+See [docs/gavi-countries.md](docs/gavi-countries.md) for what the R implementation supports
+for other countries, and what the Studio derives versus what an analyst has to source.
 
 ## Documentation
 
@@ -101,6 +110,7 @@ Rscript mcmarcel-rs/parity/build_belgium_pack.R
 | [docs/evidence-model.md](docs/evidence-model.md) | Evidence statuses, production gates, fixture stamping |
 | [docs/pack-schema.md](docs/pack-schema.md) | Country pack JSON reference and the path to production |
 | [docs/questionnaire.md](docs/questionnaire.md) | The country-pack questionnaire: the guided wizard and the standalone toolkit |
+| [docs/gavi-countries.md](docs/gavi-countries.md) | The Gavi-eligible countries: what the R model supports and what the Studio derives |
 
 ## The website
 

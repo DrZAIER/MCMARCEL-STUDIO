@@ -100,6 +100,7 @@ export function Countries({
   const [tab, setTab] = useState<EditorTab>('parameters');
   const [newOpen, setNewOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const [newName, setNewName] = useState('');
   const [newIso3, setNewIso3] = useState('');
   const [newTemplate, setNewTemplate] = useState<'demo' | 'blank'>('demo');
@@ -123,6 +124,17 @@ export function Countries({
 
   const issueCount = validation?.issues.filter((issue) => issue.severity !== 'info').length ?? 0;
   const blockingCount = validation?.issues.filter((issue) => issue.blocks_production).length ?? 0;
+
+  const filteredCountries = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return countries;
+    return countries.filter(
+      (item) =>
+        item.name.toLowerCase().includes(term) ||
+        item.iso3.toLowerCase().includes(term) ||
+        item.id.toLowerCase().includes(term),
+    );
+  }, [countries, search]);
 
   async function submitNew() {
     if (!newName.trim() || newIso3.trim().length !== 3) {
@@ -164,8 +176,23 @@ export function Countries({
           </div>
           <Button icon="plus" onClick={() => setNewOpen(true)} variant="secondary">New</Button>
         </div>
+        <div className="country-search">
+          <Icon name="search" size={16} />
+          <input
+            type="search"
+            value={search}
+            placeholder="Filter by name or ISO3 code"
+            onChange={(event) => setSearch(event.target.value)}
+            aria-label="Filter country packs"
+          />
+          {search && (
+            <button className="icon-button" onClick={() => setSearch('')} aria-label="Clear the filter">
+              ×
+            </button>
+          )}
+        </div>
         <div className="country-cards">
-          {countries.map((item) => (
+          {filteredCountries.map((item) => (
             <button
               key={item.id}
               className={`country-card ${item.id === country?.id ? 'active' : ''}`}
@@ -180,6 +207,9 @@ export function Countries({
               <span className="country-meta">Updated {formatDate(item.updated_at_ms)}</span>
             </button>
           ))}
+          {filteredCountries.length === 0 && (
+            <p className="table-note">No country matches “{search}”.</p>
+          )}
           {countries.length === 0 && (
             <EmptyState icon="globe" title="No country packs" action={<Button onClick={() => setNewOpen(true)}>Create one</Button>}>
               Start from the synthetic demo or a blank evidence template.

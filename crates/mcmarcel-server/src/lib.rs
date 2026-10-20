@@ -220,14 +220,30 @@ pub async fn serve(config: ServerConfig) -> Result<RunningServer, Box<dyn std::e
 }
 
 /// Import every country pack in `packs_dir` that is not in the library yet.
+///
+/// The directory is walked one level deep, so `packs/` and `packs/gavi/` are both
+/// picked up.
 fn import_packs(store: &Store, packs_dir: Option<&std::path::Path>) -> Result<(), Box<dyn std::error::Error>> {
     let Some(directory) = packs_dir else { return Ok(()) };
     let Ok(entries) = std::fs::read_dir(directory) else { return Ok(()) };
+    let entries: Vec<PathBuf> = entries.filter_map(|entry| entry.ok()).map(|entry| entry.path()).collect();
     let mut paths: Vec<PathBuf> = entries
-        .filter_map(|entry| entry.ok())
-        .map(|entry| entry.path())
+        .iter()
         .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("json"))
+        .cloned()
         .collect();
+    for entry in &entries {
+        if !entry.is_dir() {
+            continue;
+        }
+        let Ok(files) = std::fs::read_dir(entry) else { continue };
+        for file in files.filter_map(Result::ok) {
+            let path = file.path();
+            if path.extension().and_then(|ext| ext.to_str()) == Some("json") {
+                paths.push(path);
+            }
+        }
+    }
     paths.sort();
     for path in paths {
         let pack = match CountryPack::from_json_file(&path) {
