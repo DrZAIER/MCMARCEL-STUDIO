@@ -23,6 +23,14 @@ enum Command {
         #[arg(long, default_value = "packs/tunisia-demo.json")]
         out: PathBuf,
     },
+    /// Export the country-pack questionnaire as a standalone toolkit.
+    Questionnaire {
+        #[arg(long, default_value = "docs/questionnaire")]
+        out: PathBuf,
+        /// Also write the machine-readable catalogue as JSON.
+        #[arg(long, default_value_t = true)]
+        json: bool,
+    },
     /// Validate a country pack without running the model.
     Validate {
         #[arg(long)]
@@ -59,6 +67,26 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
             let pack = demo_pack();
             pack.save_json_file(&out)?;
             println!("wrote synthetic demo pack to {}", out.display());
+        }
+        Command::Questionnaire { out, json } => {
+            let catalogue = mcmarcel_core::questionnaire::catalogue();
+            fs::create_dir_all(&out)?;
+            let markdown = out.join("questionnaire.md");
+            fs::write(&markdown, catalogue.to_markdown())?;
+            println!("wrote {}", markdown.display());
+            let csv = out.join("questionnaire.csv");
+            fs::write(&csv, catalogue.to_csv())?;
+            println!("wrote {}", csv.display());
+            if json {
+                let catalogue_path = out.join("questionnaire.json");
+                fs::write(&catalogue_path, serde_json::to_string_pretty(&catalogue)?)?;
+                println!("wrote {}", catalogue_path.display());
+            }
+            println!(
+                "{} questions in {} sections",
+                catalogue.questions.len(),
+                catalogue.groups.len()
+            );
         }
         Command::Validate { pack, mode } => {
             let pack = CountryPack::from_json_file(pack)?;

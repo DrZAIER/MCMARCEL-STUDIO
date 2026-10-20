@@ -76,6 +76,7 @@ export function Countries({
   onCreate,
   onDelete,
   onRun,
+  onStartQuestionnaire,
 }: {
   countries: CountryListItem[];
   country: CountryRecord | null;
@@ -94,6 +95,7 @@ export function Countries({
   onCreate: (input: { name: string; iso3: string; template: 'demo' | 'blank' }) => Promise<void>;
   onDelete: (id: string) => Promise<void>;
   onRun: () => void;
+  onStartQuestionnaire: () => void;
 }) {
   const [tab, setTab] = useState<EditorTab>('parameters');
   const [newOpen, setNewOpen] = useState(false);
@@ -375,6 +377,25 @@ export function Countries({
             </>
           }
         >
+          <div className="questionnaire-choice">
+            <div>
+              <strong>Guided questionnaire</strong>
+              <p>
+                Walk through the 77 parameters of a country pack, with the definition, the unit and where a
+                defensible value comes from for each one.
+              </p>
+            </div>
+            <Button
+              variant="secondary"
+              icon="book"
+              onClick={() => {
+                setNewOpen(false);
+                onStartQuestionnaire();
+              }}
+            >
+              Start the questionnaire
+            </Button>
+          </div>
           <div className="form-grid">
             <Field label="Country name">
               <input value={newName} onChange={(event) => setNewName(event.target.value)} placeholder="e.g. Ghana" autoFocus />
@@ -382,7 +403,7 @@ export function Countries({
             <Field label="ISO3 code">
               <input value={newIso3} maxLength={3} onChange={(event) => setNewIso3(event.target.value.toUpperCase())} placeholder="GHA" />
             </Field>
-            <Field label="Starting point" hint="The demo is synthetic. The blank template contains no values." className="span-2">
+            <Field label="Or start from a template" hint="The demo is synthetic. The blank template contains no values." className="span-2">
               <select value={newTemplate} onChange={(event) => setNewTemplate(event.target.value as 'demo' | 'blank')}>
                 <option value="demo">Synthetic demo pack (runnable fixture)</option>
                 <option value="blank">Blank evidence template (production gate closed)</option>

@@ -8,13 +8,14 @@ pub const AGE_MONTHS: usize = 60;
 pub const CALENDAR_MONTHS: usize = 12;
 pub const SCHEMA_VERSION: u32 = 1;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum EvidenceStatus {
     Ok,
     Derived,
     Transfer,
     Convention,
+    #[default]
     Missing,
     Synthetic,
 }

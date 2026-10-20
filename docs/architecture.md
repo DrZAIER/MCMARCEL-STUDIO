@@ -37,6 +37,7 @@ The engine has no I/O dependencies and is the only place where modelling decisio
 | `engine` | Monthly cohort simulation, burden, costs, QALYs, discounting, aggregation |
 | `analysis` | ICER table, dominance and frontier detection, INMB grid, P\* thresholds |
 | `validate` | Structural, range and evidence checks; the production gate |
+| `questionnaire` | The country-pack questionnaire: every parameter with its definition, sourcing guidance and known sources; the wizard's data model and the standalone export |
 
 The engine is deterministic: the same pack, seed and draw count always produce byte-identical
 results, which is what makes the R parity fixtures meaningful.
@@ -98,6 +99,8 @@ in the browser.
 |--------|------|---------|
 | `GET` | `/api/health` | Liveness, engine version, database path |
 | `GET` | `/api/meta` | Engine metadata, model list, licence |
+| `GET` | `/api/questionnaire` | The country-pack questionnaire: sections, questions, definitions, known sources |
+| `POST` | `/api/questionnaire/pack` | Build a country pack from a completed questionnaire |
 | `GET` | `/api/countries` | Library index with production readiness |
 | `POST` | `/api/countries` | Create a pack from the synthetic demo or the blank template |
 | `GET` | `/api/countries/{id}` | Full country record including the pack |

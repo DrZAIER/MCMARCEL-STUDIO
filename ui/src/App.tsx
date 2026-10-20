@@ -13,6 +13,7 @@ import type {
 import { Layout, type Page } from './Layout';
 import { Dashboard } from './Dashboard';
 import { Countries } from './Countries';
+import { Questionnaire } from './Questionnaire';
 import { RunPanel } from './RunPanel';
 import { Results } from './Results';
 import { Methods } from './Methods';
@@ -357,6 +358,18 @@ export default function App() {
           onCreate={createCountry}
           onDelete={deleteCountry}
           onRun={openRunPanel}
+          onStartQuestionnaire={() => setPage('questionnaire')}
+        />
+      )}
+      {page === 'questionnaire' && (
+        <Questionnaire
+          onCancel={() => setPage('countries')}
+          onCreated={async (id) => {
+            await refreshLists();
+            await loadCountry(id);
+            setPage('countries');
+            notify('Country pack created from the questionnaire');
+          }}
         />
       )}
       {page === 'run' && (

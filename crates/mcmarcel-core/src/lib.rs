@@ -9,6 +9,7 @@ pub mod engine;
 pub mod error;
 pub mod model;
 pub mod pack;
+pub mod questionnaire;
 pub mod rng;
 pub mod types;
 pub mod validate;

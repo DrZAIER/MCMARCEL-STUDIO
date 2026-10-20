@@ -2,6 +2,8 @@ import type {
   CountryListItem,
   CountryPack,
   CountryRecord,
+  QuestionnaireCatalogue,
+  QuestionnaireSubmission,
   RunListItem,
   RunMode,
   RunRecord,
@@ -53,4 +55,7 @@ export const api = {
   getRun: (id: string) => request<RunRecord>(`/api/runs/${encodeURIComponent(id)}`),
   createRun: (input: { country_id: string; draws: number; seed: number; mode: RunMode }) =>
     request<RunRecord>('/api/runs', { method: 'POST', body: JSON.stringify(input) }),
+  questionnaire: () => request<QuestionnaireCatalogue>('/api/questionnaire'),
+  createFromQuestionnaire: (submission: QuestionnaireSubmission) =>
+    request<CountryRecord>('/api/questionnaire/pack', { method: 'POST', body: JSON.stringify(submission) }),
 };

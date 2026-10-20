@@ -88,6 +88,25 @@ Rscript mcmarcel-rs/parity/build_belgium_pack.R
 | [docs/model.md](docs/model.md) | The cohort model, sampling, discounting and cost-effectiveness analysis |
 | [docs/evidence-model.md](docs/evidence-model.md) | Evidence statuses, production gates, fixture stamping |
 | [docs/pack-schema.md](docs/pack-schema.md) | Country pack JSON reference and the path to production |
+| [docs/questionnaire.md](docs/questionnaire.md) | The country-pack questionnaire: the guided wizard and the standalone toolkit |
+
+## Building a country pack
+
+The application does not ask an analyst to guess which numbers a country needs. The
+**questionnaire** is the explicit contract: 77 parameters in seven sections, each with a
+definition, its unit, why it matters, how to source it, the known sources of the reference
+implementation and the evidence status that fits.
+
+* **In the interface:** `Build a pack` in the sidebar opens the guided wizard, which walks
+  through the sections and reports the progress and the number of blocking questions.
+* **Offline:** the same content is exported as a printable Markdown document and a CSV:
+
+  ```bash
+  cargo run --release -p mcmarcel-cli -- questionnaire --out docs/questionnaire
+  ```
+
+  The exported files live in [docs/questionnaire/](docs/questionnaire/) and are generated from
+  the same catalogue as the wizard, so the two cannot drift apart.
 
 ## The application in five screens
 

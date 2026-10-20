@@ -223,3 +223,63 @@ export interface RunListItem {
   pack_name?: string | null;
   fixture_stamp?: string | null;
 }
+
+export type QuestionKind = 'number' | 'quantity' | 'text' | 'proportion';
+
+export interface ReferenceSource {
+  citation: string;
+  note: string;
+  reference_model: boolean;
+}
+
+export interface QuestionnaireGroup {
+  id: string;
+  title: string;
+  description: string;
+  order: number;
+  required_for_run: boolean;
+}
+
+export interface QuestionnaireQuestion {
+  key: string;
+  label: string;
+  group: string;
+  unit: string;
+  kind: QuestionKind;
+  definition: string;
+  why_it_matters: string;
+  how_to_source: string;
+  reference_sources: ReferenceSource[];
+  range: [number, number] | null;
+  evidence_guidance: string;
+  blocks: string[];
+  optional: boolean;
+}
+
+export interface QuestionnaireCatalogue {
+  groups: QuestionnaireGroup[];
+  questions: QuestionnaireQuestion[];
+}
+
+export interface QuestionnaireAnswer {
+  value: number | string | null;
+  status: EvidenceStatus;
+  source: string | null;
+  notes: string | null;
+}
+
+export interface QuestionnaireIdentity {
+  name: string;
+  iso3: string;
+  currency: string;
+  price_year: number;
+  perspective: string;
+  region: string;
+  locale: string;
+  notes: string;
+}
+
+export interface QuestionnaireSubmission {
+  country: QuestionnaireIdentity;
+  answers: Record<string, QuestionnaireAnswer>;
+}

@@ -150,6 +150,8 @@ pub fn build_router(store: Store, ui_dir: &PathBuf) -> Router {
     let api = Router::new()
         .route("/api/health", get(health))
         .route("/api/meta", get(meta))
+        .route("/api/questionnaire", get(questionnaire))
+        .route("/api/questionnaire/pack", post(questionnaire_pack))
         .route("/api/countries", get(list_countries).post(create_country))
         .route("/api/countries/{id}", get(get_country).put(update_country).delete(delete_country))
         .route("/api/countries/{id}/validate", post(validate_country))
@@ -267,6 +269,23 @@ async fn meta(State(state): State<AppState>) -> Json<MetaResponse> {
         models: vec!["static monthly birth-cohort RSV model", "probabilistic CEA"],
         license: "GPL-3.0-or-later",
     })
+}
+
+/// The country-pack questionnaire: every parameter with its definition, unit,
+/// sourcing guidance and known sources.
+async fn questionnaire() -> Json<mcmarcel_core::questionnaire::Catalogue> {
+    Json(mcmarcel_core::questionnaire::catalogue())
+}
+
+/// Build a country pack from a completed questionnaire.
+async fn questionnaire_pack(
+    State(state): State<AppState>,
+    Json(submission): Json<mcmarcel_core::questionnaire::Submission>,
+) -> Result<Json<CountryRecord>, ApiError> {
+    let pack = submission.to_pack().map_err(|error| ApiError::bad_request(error.to_string()))?;
+    let mode = mcmarcel_core::questionnaire::initial_mode(&pack);
+    let record = state.store.save_country(&pack, mode)?;
+    Ok(Json(record))
 }
 
 async fn list_countries(

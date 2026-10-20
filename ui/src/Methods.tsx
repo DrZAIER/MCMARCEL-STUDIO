@@ -116,6 +116,15 @@ export function Methods({
             <Icon name="info" size={18} />
             <span>Need a new country? Start from the blank template, import documented inputs, then let validation drive the gap list.</span>
           </div>
+          <div className="callout">
+            <Icon name="book" size={18} />
+            <span>
+              The country-pack questionnaire lists every parameter with its definition, its unit, where a
+              defensible value comes from and how its evidence has to be classified. Use it in the interface
+              under <strong>Build a pack</strong>, or export it as a printable document with{' '}
+              <code>mcmarcel-cli questionnaire</code>.
+            </span>
+          </div>
         </Card>
       </div>
     </div>

@@ -2,11 +2,12 @@ import type { ReactNode } from 'react';
 import type { CountryListItem } from './types';
 import { Icon, StatusPill } from './ui';
 
-export type Page = 'dashboard' | 'countries' | 'run' | 'results' | 'methods';
+export type Page = 'dashboard' | 'countries' | 'questionnaire' | 'run' | 'results' | 'methods';
 
-const navItems: Array<{ id: Page; label: string; icon: 'dashboard' | 'globe' | 'play' | 'chart' | 'book' }> = [
+const navItems: Array<{ id: Page; label: string; icon: 'dashboard' | 'globe' | 'play' | 'chart' | 'book' | 'plus' }> = [
   { id: 'dashboard', label: 'Overview', icon: 'dashboard' },
   { id: 'countries', label: 'Countries', icon: 'globe' },
+  { id: 'questionnaire', label: 'Build a pack', icon: 'plus' },
   { id: 'run', label: 'Run model', icon: 'play' },
   { id: 'results', label: 'Results', icon: 'chart' },
   { id: 'methods', label: 'Methods & evidence', icon: 'book' },
@@ -15,6 +16,7 @@ const navItems: Array<{ id: Page; label: string; icon: 'dashboard' | 'globe' | '
 const titles: Record<Page, { eyebrow: string; title: string }> = {
   dashboard: { eyebrow: 'Decision support', title: 'Overview' },
   countries: { eyebrow: 'Country configuration', title: 'Countries & scenarios' },
+  questionnaire: { eyebrow: 'Guided questionnaire', title: 'Build a country pack' },
   run: { eyebrow: 'Probabilistic engine', title: 'Run model' },
   results: { eyebrow: 'Cost-effectiveness', title: 'Results' },
   methods: { eyebrow: 'Scientific integrity', title: 'Methods & evidence' },
