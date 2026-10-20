@@ -14,6 +14,10 @@
 /ui/dist/
 /ui/.vite/
 
+# Static site (built by the Pages workflow)
+/site/dist/
+/site/content/
+
 # Editors and OS noise
 .DS_Store
 Thumbs.db

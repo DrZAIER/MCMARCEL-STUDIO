@@ -1,0 +1,57 @@
+name: Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build the site
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - uses: actions/configure-pages@v5
+      - name: Install the interface dependencies
+        run: npm ci
+        working-directory: ui
+      - name: Build the interface
+        run: npm run build
+        working-directory: ui
+      - uses: actions-rust-lang/setup-rust-toolchain@v1
+        with:
+          toolchain: stable
+      - name: Export the questionnaire
+        run: cargo run --release -p mcmarcel-cli -- questionnaire --out site/content/questionnaire
+      - name: Run the Belgian reference case
+        run: cargo run --release -p mcmarcel-cli -- run --pack packs/belgium-belx.json --out site/content/belgium --draws 500
+      - name: Build the site
+        run: node ui/scripts/build-site.mjs --out site/dist
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

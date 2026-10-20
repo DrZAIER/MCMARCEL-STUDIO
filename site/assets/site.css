@@ -1,0 +1,99 @@
+:root {
+  color-scheme: light;
+  --bg: #f2f0e8;
+  --panel: #fffdf8;
+  --panel-2: #f8f5ec;
+  --ink: #172522;
+  --ink-soft: #33433f;
+  --muted: #687873;
+  --line: #ddd8ca;
+  --line-strong: #c9c2b1;
+  --brand: #0b4f48;
+  --brand-2: #13786c;
+  --brand-3: #d9eee8;
+  --accent: #c96f3b;
+  --good: #2e7d5b;
+  --warn: #a8641d;
+  --bad: #a93e4a;
+  --display: "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --body: "Aptos", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "Cascadia Code", "SFMono-Regular", Consolas, monospace;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  line-height: 1.6;
+}
+a { color: var(--brand-2); }
+code, pre { font-family: var(--mono); font-size: 0.86em; }
+pre {
+  background: #0d2b28;
+  color: #e9f2ef;
+  padding: 14px 16px;
+  border-radius: 10px;
+  overflow-x: auto;
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+pre code { color: inherit; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; letter-spacing: -0.015em; line-height: 1.2; }
+h1 { font-size: 2.2rem; margin: 0 0 12px; }
+h2 { font-size: 1.5rem; margin: 34px 0 10px; }
+h3 { font-size: 1.12rem; margin: 0 0 6px; }
+p { margin: 0 0 12px; }
+.eyebrow { text-transform: uppercase; letter-spacing: 0.16em; font-size: 0.72rem; color: var(--muted); margin: 0 0 6px; }
+.lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 62ch; }
+.muted { color: var(--muted); font-size: 0.88rem; }
+main { max-width: 980px; margin: 0 auto; padding: 34px 22px 60px; }
+footer { max-width: 980px; margin: 0 auto; padding: 20px 22px 50px; color: var(--muted); font-size: 0.8rem; }
+.site-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 20px; flex-wrap: wrap;
+  padding: 14px 22px; background: #0a2926; color: #f4f0e5;
+}
+.site-head .brand { display: flex; align-items: center; gap: 10px; color: #f4f0e5; text-decoration: none; font-family: var(--display); font-size: 1.1rem; }
+.site-head .brand em { font-style: normal; color: #e8c98f; }
+.site-head .mark {
+  width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center;
+  background: #e8c98f; color: #0a2926; font-weight: 700; font-family: var(--display);
+}
+.site-head nav { display: flex; gap: 4px; flex-wrap: wrap; }
+.site-head nav a { color: #c6d4ce; text-decoration: none; font-size: 0.84rem; padding: 6px 10px; border-radius: 8px; }
+.site-head nav a:hover { background: rgba(255, 255, 255, 0.08); color: #fff; }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 26px 0; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 20px; box-shadow: 0 12px 30px rgba(23, 37, 34, 0.06); }
+.card p { font-size: 0.9rem; color: var(--ink-soft); }
+.button {
+  display: inline-block; background: var(--brand); color: #fff; text-decoration: none;
+  padding: 9px 15px; border-radius: 9px; font-weight: 650; font-size: 0.86rem; margin: 4px 6px 0 0;
+}
+.button.ghost { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line-strong); }
+.button:hover { filter: brightness(1.08); }
+.notice {
+  background: var(--warn-soft, #f6e6cf); border: 1px solid #e4c9a4; color: #6b4212;
+  padding: 12px 14px; border-radius: 10px; font-size: 0.88rem; margin: 14px 0;
+}
+table.data { width: 100%; border-collapse: collapse; font-size: 0.86rem; margin: 12px 0 20px; }
+table.data th, table.data td { border-bottom: 1px solid var(--line); padding: 8px 10px; text-align: left; }
+table.data th { background: var(--panel-2); font-weight: 650; }
+table.data td.num, table.data th.num { text-align: right; font-family: var(--mono); font-size: 0.8rem; }
+table.data td.good { color: var(--good); }
+table.data td.warn { color: var(--warn); }
+.prose { max-width: 78ch; }
+.prose h2 { margin-top: 30px; }
+.prose h3 { margin-top: 22px; }
+.prose ul, .prose ol { padding-left: 22px; }
+.prose li { margin-bottom: 4px; }
+.prose blockquote { border-left: 3px solid var(--line-strong); margin: 16px 0; padding: 2px 0 2px 14px; color: var(--ink-soft); }
+.prose table { width: 100%; border-collapse: collapse; font-size: 0.85rem; margin: 14px 0; }
+.prose th, .prose td { border-bottom: 1px solid var(--line); padding: 7px 9px; text-align: left; vertical-align: top; }
+.prose th { background: var(--panel-2); }
+.prose hr { border: 0; border-top: 1px solid var(--line); margin: 26px 0; }
+.prose img { max-width: 100%; }
+@media (max-width: 720px) {
+  .site-head { flex-direction: column; align-items: flex-start; }
+  h1 { font-size: 1.7rem; }
+}
