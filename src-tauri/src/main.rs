@@ -92,15 +92,14 @@ fn resolve_config(app: &tauri::AppHandle) -> ServerConfig {
         .unwrap_or_else(|_| resolve_ui_dir(app));
 
     let packs_dir = std::env::var("MCMARCEL_PACKS_DIR")
+        .ok()
         .map(PathBuf::from)
         .or_else(|| {
-            let candidate = app
-                .path()
+            app.path()
                 .resource_dir()
                 .ok()
                 .map(|dir| dir.join("packs"))
-                .filter(|dir| dir.is_dir());
-            candidate
+                .filter(|dir| dir.is_dir())
         });
 
     ServerConfig { db_path, ui_dir, packs_dir, port: 0, seed_demo: true }
